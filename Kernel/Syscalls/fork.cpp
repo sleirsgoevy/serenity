@@ -106,6 +106,21 @@ ErrorOr<FlatPtr> Process::sys$fork(RegisterState& regs)
 
     dbgln_if(FORK_DEBUG, "fork: child will begin executing at {:#04x}:{:p} with stack {:p}, kstack {:p}",
         child_regs.cs, child_regs.rip, child_regs.rsp, child_regs.rsp0);
+#elif ARCH(I386)
+    child_regs.eax = 0; // fork() returns 0 in the child :^)
+    child_regs.ebx = regs.ebx;
+    child_regs.ecx = regs.ecx;
+    child_regs.edx = regs.edx;
+    child_regs.ebp = regs.ebp;
+    child_regs.esp = regs.userspace_esp;
+    child_regs.esi = regs.esi;
+    child_regs.edi = regs.edi;
+    child_regs.eflags = regs.eflags;
+    child_regs.eip = regs.eip;
+    child_regs.cs = regs.cs;
+
+    dbgln_if(FORK_DEBUG, "fork: child will begin executing at {:#04x}:{:p} with stack {:p}, kstack {:p}",
+        child_regs.cs, child_regs.eip, child_regs.esp, child_regs.esp0);
 #elif ARCH(AARCH64)
     child_regs.x[0] = 0; // fork() returns 0 in the child :^)
     for (size_t i = 1; i < array_size(child_regs.x); ++i)

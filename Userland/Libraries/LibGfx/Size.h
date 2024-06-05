@@ -175,7 +175,7 @@ public:
     }
 
     template<typename U>
-    requires(!IsSame<T, U>)
+    //requires(!IsSame<T, U>)
     [[nodiscard]] ALWAYS_INLINE constexpr Size<U> to_type() const
     {
         return Size<U>(*this);

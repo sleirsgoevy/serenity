@@ -760,7 +760,7 @@ Examples of static-pie ELF objects are ELF packers, and the system dynamic loade
         asm("brk #0");
 #elif ARCH(RISCV64)
         asm("ebreak");
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
         asm("int3");
 #else
 #    error "Unknown architecture"

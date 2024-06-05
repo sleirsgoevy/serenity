@@ -9,7 +9,7 @@
 
 #include <AK/BuiltinWrappers.h>
 #include <AK/FloatingPoint.h>
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <AK/FPControl.h>
 #endif
 #include <AK/Math.h>
@@ -379,7 +379,7 @@ MAKE_AK_BACKED2(remainder);
 
 long double truncl(long double x) NOEXCEPT
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (fabsl(x) < LONG_LONG_MAX) {
         // This is 1.6 times faster than the implementation using the "internal_to_integer"
         // helper (on x86_64)
@@ -399,7 +399,7 @@ long double truncl(long double x) NOEXCEPT
 
 double trunc(double x) NOEXCEPT
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (fabs(x) < LONG_LONG_MAX) {
         u64 temp;
         asm(
@@ -424,7 +424,7 @@ double trunc(double x) NOEXCEPT
 
 float truncf(float x) NOEXCEPT
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (fabsf(x) < LONG_LONG_MAX) {
         u64 temp;
         asm(
@@ -455,7 +455,7 @@ long double rintl(long double value)
 #elif ARCH(RISCV64)
     (void)value;
     TODO_RISCV64();
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long double res;
     asm(
         "frndint\n"
@@ -478,7 +478,7 @@ double rint(double value)
         : "=r"(output)
         : "f"(value));
     return static_cast<double>(output);
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     double res;
     asm(
         "frndint\n"
@@ -501,7 +501,7 @@ float rintf(float value)
         : "=r"(output)
         : "f"(value));
     return static_cast<float>(output);
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     float res;
     asm(
         "frndint\n"
@@ -521,7 +521,7 @@ long lrintl(long double value)
 #elif ARCH(RISCV64)
     (void)value;
     TODO_RISCV64();
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long res;
     asm(
         "fistpl %0\n"
@@ -545,7 +545,7 @@ long lrint(double value)
         : "=r"(output)
         : "f"(value));
     return output;
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long res;
     asm(
         "fistpl %0\n"
@@ -569,7 +569,7 @@ long lrintf(float value)
         : "=r"(output)
         : "f"(value));
     return output;
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long res;
     asm(
         "fistpl %0\n"
@@ -590,7 +590,7 @@ long long llrintl(long double value)
 #elif ARCH(RISCV64)
     // NOTE: RISC-V LP64 specifies long long == long.
     return static_cast<long long>(lrintl(value));
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long long res;
     asm(
         "fistpq %0\n"
@@ -610,7 +610,7 @@ long long llrint(double value)
 #elif ARCH(RISCV64)
     // NOTE: RISC-V LP64 specifies long long == long.
     return static_cast<long long>(lrint(value));
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long long res;
     asm(
         "fistpq %0\n"
@@ -630,7 +630,7 @@ long long llrintf(float value)
 #elif ARCH(RISCV64)
     // NOTE: RISC-V LP64 specifies long long == long.
     return static_cast<long long>(lrintf(value));
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     long long res;
     asm(
         "fistpq %0\n"
@@ -831,7 +831,7 @@ float floorf(float value) NOEXCEPT
             : "f"(value));
         return static_cast<float>(output);
     }
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     AK::X87RoundingModeScope scope { AK::RoundingMode::DOWN };
     asm("frndint"
         : "+t"(value));
@@ -850,7 +850,7 @@ double floor(double value) NOEXCEPT
             : "f"(value));
         return static_cast<double>(output);
     }
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     AK::X87RoundingModeScope scope { AK::RoundingMode::DOWN };
     asm("frndint"
         : "+t"(value));
@@ -861,7 +861,7 @@ double floor(double value) NOEXCEPT
 
 long double floorl(long double value) NOEXCEPT
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     AK::X87RoundingModeScope scope { AK::RoundingMode::DOWN };
     asm("frndint"
         : "+t"(value));
@@ -880,7 +880,7 @@ float ceilf(float value) NOEXCEPT
             : "f"(value));
         return static_cast<float>(output);
     }
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     AK::X87RoundingModeScope scope { AK::RoundingMode::UP };
     asm("frndint"
         : "+t"(value));
@@ -899,7 +899,7 @@ double ceil(double value) NOEXCEPT
             : "f"(value));
         return static_cast<double>(output);
     }
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     AK::X87RoundingModeScope scope { AK::RoundingMode::UP };
     asm("frndint"
         : "+t"(value));
@@ -910,7 +910,7 @@ double ceil(double value) NOEXCEPT
 
 long double ceill(long double value) NOEXCEPT
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     AK::X87RoundingModeScope scope { AK::RoundingMode::UP };
     asm("frndint"
         : "+t"(value));

@@ -292,7 +292,7 @@ file(WRITE "${CMAKE_STAGING_PREFIX}/${CMAKE_INSTALL_LIBDIR}/libm.so" "INPUT(libc
 file(WRITE "${CMAKE_STAGING_PREFIX}/${CMAKE_INSTALL_LIBDIR}/libssp.so" "INPUT(libc.so)")
 
 # ===== LibC for DynamicLoader =====
-add_library(DynamicLoader_LibC STATIC ${SOURCES})
+add_library(DynamicLoader_LibC STATIC ${SOURCES} crt0_shared.cpp)
 target_link_libraries(DynamicLoader_LibC
     PUBLIC DynamicLoader_CompileOptions
     PRIVATE DynamicLoader_LibSystem

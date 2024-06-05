@@ -464,6 +464,72 @@ if ("${SERENITY_ARCH}" STREQUAL "x86_64")
             ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/SyscallEntry.cpp
         )
     endif()
+elseif("${SERENITY_ARCH}" STREQUAL "i386")
+    set(KERNEL_SOURCES
+        ${KERNEL_SOURCES}
+
+        Arch/i386/archctl.cpp
+        Arch/x86_64/CMOS.cpp
+        Arch/x86_64/DebugOutput.cpp
+        Arch/x86_64/Delay.cpp
+
+        Arch/x86_64/Firmware/ACPI/StaticParsing.cpp
+        Arch/x86_64/Firmware/MultiProcessor/Parser.cpp
+        Arch/x86_64/Firmware/PCBIOS/Mapper.cpp
+        Arch/x86_64/Firmware/PCBIOS/SysFSComponent.cpp
+        Arch/x86_64/Firmware/PCBIOS/SysFSDirectory.cpp
+
+        Arch/x86_64/Hypervisor/BochsDisplayConnector.cpp
+        Arch/x86_64/Hypervisor/VMWareBackdoor.cpp
+
+        Arch/x86_64/CurrentTime.cpp
+
+        Arch/x86_64/I8042Reboot.cpp
+        Arch/x86_64/Interrupts/APIC.cpp
+        Arch/x86_64/Interrupts/IOAPIC.cpp
+        Arch/x86_64/Interrupts/PIC.cpp
+        Arch/x86_64/Time/APICTimer.cpp
+        Arch/x86_64/Time/HPET.cpp
+        Arch/x86_64/Time/HPETComparator.cpp
+        Arch/x86_64/Time/PIT.cpp
+        Arch/x86_64/Time/RTC.cpp
+        Arch/x86_64/PCSpeaker.cpp
+
+        Arch/x86_64/PCI/Controller/PIIX4HostBridge.cpp
+        Arch/x86_64/PCI/Initializer.cpp
+        Arch/x86_64/PCI/MSI.cpp
+
+        Arch/x86_64/PowerState.cpp
+        Arch/x86_64/RTC.cpp
+        Arch/x86_64/Shutdown.cpp
+        Arch/x86_64/SmapDisabler.cpp
+
+        # TODO: Share these with the aarch64 build
+        Interrupts/SpuriousInterruptHandler.cpp
+        kprintf.cpp        
+    )
+
+    set(KERNEL_SOURCES
+        ${KERNEL_SOURCES}
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/Boot/ap_setup.S
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/InterruptEntry.cpp
+    )
+
+    set(KERNEL_SOURCES
+        ${KERNEL_SOURCES}
+        
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/ASM_wrapper.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/CPU.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/CPUID.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/InterruptManagement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/Interrupts.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/PageDirectory.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/Processor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/ProcessorInfo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/SafeMem.cpp
+    )
+
 elseif("${SERENITY_ARCH}" STREQUAL "aarch64")
     set(RPI_SOURCES
         Arch/aarch64/RPi/DebugOutput.cpp
@@ -816,7 +882,7 @@ elseif("${SERENITY_ARCH}" STREQUAL "riscv64")
     target_link_options(Kernel PRIVATE LINKER:-T ${CMAKE_CURRENT_SOURCE_DIR}/Arch/riscv64/linker.ld -nostdlib LINKER:--no-pie LINKER:-X)
 
     set_target_properties(Kernel PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Arch/riscv64/linker.ld)
-elseif ("${SERENITY_ARCH}" STREQUAL "x86_64")
+elseif ("${SERENITY_ARCH}" STREQUAL "x86_64" OR "${SERENITY_ARCH}" STREQUAL "i386")
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/linker.ld
         COMMAND "${CMAKE_CXX_COMPILER}" ${TARGET_STRING} -E -P -x c -I${CMAKE_CURRENT_SOURCE_DIR}/.. "${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/linker.ld" -o "${CMAKE_CURRENT_BINARY_DIR}/linker.ld"
@@ -832,6 +898,9 @@ elseif ("${SERENITY_ARCH}" STREQUAL "x86_64")
         target_compile_options(Kernel PRIVATE -mpreferred-stack-boundary=3)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
         target_compile_options(Kernel PRIVATE -mstack-alignment=8)
+    endif()
+    if ("${SERENITY_ARCH}" STREQUAL "i386")
+        target_compile_options(Kernel PRIVATE -march=i686)
     endif()
 endif()
 
@@ -853,10 +922,12 @@ endif()
 
 if ("${SERENITY_ARCH}" STREQUAL "x86_64")
     set(KERNEL_ELF_OBJCOPY_TARGET "elf64-x86-64")
+elseif("${SERENITY_ARCH}" STREQUAL "i386")
+    set(KERNEL_ELF_OBJCOPY_TARGET "elf32-i386")
 endif()
 
 # In x86_64 the Kernel is linked to the Pre-kernel binary.
-if ("${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${SERENITY_ARCH}" STREQUAL "x86_64" OR "${SERENITY_ARCH}" STREQUAL "i386")
     add_custom_command(
         TARGET Kernel POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E env NM=${CMAKE_NM} sh ${CMAKE_CURRENT_SOURCE_DIR}/mkmap.sh
@@ -907,6 +978,6 @@ serenity_install_headers(Kernel)
 serenity_install_sources(Kernel)
 
 # Only x86 needs a Prekernel
-if ("${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${SERENITY_ARCH}" STREQUAL "x86_64" OR "${SERENITY_ARCH}" STREQUAL "i386")
     add_subdirectory(Prekernel)
 endif()

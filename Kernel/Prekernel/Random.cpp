@@ -11,13 +11,16 @@
 #if ARCH(X86_64)
 #    include <Kernel/Arch/x86_64/ASM_wrapper.h>
 #    include <Kernel/Arch/x86_64/CPUID.h>
+#elif ARCH(I386)
+#    include <Kernel/Arch/i386/ASM_wrapper.h>
+#    include <Kernel/Arch/x86_64/CPUID.h>
 #endif
 
 u64 generate_secure_seed()
 {
     u32 seed = 0xFEEBDAED;
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     Kernel::CPUID processor_info(0x1);
     if (processor_info.edx() & (1 << 4)) // TSC
         seed ^= Kernel::read_tsc();

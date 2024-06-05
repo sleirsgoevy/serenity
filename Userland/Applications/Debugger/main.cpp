@@ -45,6 +45,10 @@ static void handle_print_registers(PtraceRegisters const& regs)
     outln("r8 ={:p} r9 ={:p} r10={:p} r11={:p}", regs.r8, regs.r9, regs.r10, regs.r11);
     outln("r12={:p} r13={:p} r14={:p} r15={:p}", regs.r12, regs.r13, regs.r14, regs.r15);
     outln("rip={:p} rflags={:p}", regs.rip, regs.rflags);
+#elif ARCH(I386)
+    outln("eax={:p} ebx={:p} ecx={:p} edx={:p}", regs.eax, regs.ebx, regs.ecx, regs.edx);
+    outln("esp={:p} ebp={:p} esi={:p} edi={:p}", regs.esp, regs.ebp, regs.esi, regs.edi);
+    outln("eip={:p} eflags={:p}", regs.eip, regs.eflags);
 #elif ARCH(AARCH64)
     (void)regs;
     TODO_AARCH64();
@@ -251,6 +255,8 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
         PtraceRegisters const& regs = optional_regs.value();
 #if ARCH(X86_64)
         FlatPtr const ip = regs.rip;
+#elif ARCH(I386)
+        FlatPtr const ip = regs.eip;
 #elif ARCH(AARCH64)
         FlatPtr const ip = 0; // FIXME
         TODO_AARCH64();

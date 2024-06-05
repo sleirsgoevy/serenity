@@ -89,7 +89,7 @@ UNMAP_AFTER_INIT static void load_kernel_symbols_from_data(Bytes buffer)
         // FIXME: Remove this ifdef once the aarch64 kernel is loaded by the Prekernel.
         //        Currently, the aarch64 kernel is linked at a high virtual memory address, instead
         //        of zero, so the address of a symbol does not need to be offset by the kernel_load_base.
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
         ksym.address = kernel_load_base + address;
 #elif ARCH(AARCH64) || ARCH(RISCV64)
         ksym.address = address;

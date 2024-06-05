@@ -16,7 +16,9 @@
 #include <Kernel/Arch/ProcessorSpecificDataID.h>
 #include <Kernel/Memory/VirtualAddress.h>
 
-#if ARCH(X86_64)
+#if ARCH(I386)
+#    include <Kernel/Arch/i386/DescriptorTable.h>
+#elif ARCH(X86_64)
 #    include <Kernel/Arch/x86_64/DescriptorTable.h>
 #endif
 
@@ -204,7 +206,7 @@ template class ProcessorBase<Processor>;
 
 }
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/Processor.h>
 #elif ARCH(AARCH64)
 #    include <Kernel/Arch/aarch64/Processor.h>

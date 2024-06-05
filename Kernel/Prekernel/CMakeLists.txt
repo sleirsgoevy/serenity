@@ -16,7 +16,7 @@ set(SOURCES
     ../../Userland/Libraries/LibELF/Relocation.cpp
     )
 
-if ("${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${SERENITY_ARCH}" STREQUAL "x86_64" OR "${SERENITY_ARCH}" STREQUAL "i386")
     set(SOURCES
         ${SOURCES}
         ../Arch/x86_64/DebugOutput.cpp)
@@ -24,6 +24,8 @@ endif()
 
 if ("${SERENITY_ARCH}" STREQUAL "x86_64")
     set(PREKERNEL_TARGET kernel_x86-64)
+elseif ("${SERENITY_ARCH}" STREQUAL "i386")
+    set(PREKERNEL_TARGET kernel_i386)
 elseif("${SERENITY_ARCH}" STREQUAL "aarch64")
     message(SEND_ERROR "Prekernel is not needed on aarch64 and should not be compiled!")
 endif()

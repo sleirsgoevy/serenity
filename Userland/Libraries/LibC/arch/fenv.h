@@ -6,7 +6,9 @@
 
 #pragma once
 
-#if defined(__x86_64__)
+#if defined(__i386__)
+#    include <arch/i386/fenv.h>
+#elif defined(__x86_64__)
 #    include <arch/x86_64/fenv.h>
 #elif defined(__aarch64__)
 #    include <arch/aarch64/fenv.h>

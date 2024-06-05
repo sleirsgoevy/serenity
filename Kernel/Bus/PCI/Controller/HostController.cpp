@@ -227,13 +227,13 @@ void HostController::configure_attached_devices(PCIConfiguration& config)
                 bar_size = (~bar_size) + 1;
                 if (bar_size == 0)
                     continue;
-                auto mmio_32bit_address = align_up_to(config.mmio_32bit_base, bar_size);
+                auto mmio_32bit_address = align_up_to(config.mmio_32bit_base, (uint64_t)bar_size);
                 if (mmio_32bit_address + bar_size <= config.mmio_32bit_end) {
                     write32_field(device_identifier.address().bus(), device_identifier.address().device(), device_identifier.address().function(), bar_offset, mmio_32bit_address);
                     config.mmio_32bit_base = mmio_32bit_address + bar_size;
                     continue;
                 }
-                auto mmio_64bit_address = align_up_to(config.mmio_64bit_base, bar_size);
+                auto mmio_64bit_address = align_up_to(config.mmio_64bit_base, (uint64_t)bar_size);
                 if (bar_prefetchable && mmio_64bit_address + bar_size <= config.mmio_64bit_end && mmio_64bit_address + bar_size <= NumericLimits<u32>::max()) {
                     write32_field(device_identifier.address().bus(), device_identifier.address().device(), device_identifier.address().function(), bar_offset, mmio_64bit_address);
                     config.mmio_64bit_base = mmio_64bit_address + bar_size;

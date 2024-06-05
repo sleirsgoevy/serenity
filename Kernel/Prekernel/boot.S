@@ -24,7 +24,7 @@ boot_pdpt:
 .skip 4096
 .global boot_pd0
 boot_pd0:
-.skip (4096 * 4)
+.skip 4096
 .global boot_pd0_pts
 boot_pd0_pts:
 .skip 4096 * (MAX_KERNEL_SIZE >> 21)
@@ -65,10 +65,10 @@ pml4t:
 
 pdpt
 
-    0: boot_pd0             (0-1GB)
-    1: boot_pd0 + 4096      (1-2GB)
-    2: boot_pd0 + 4096 * 2  (2-3GB)
-    3: boot_pd0 + 4096 * 3  (3-4GB)
+    0: boot_pd0 (0-1GB)
+    1: n/a      (1-2GB)
+    2: n/a      (2-3GB)
+    3: n/a      (3-4GB)
 
 boot_pd0 : 512 PDEs
 
@@ -78,6 +78,7 @@ the page tables each contain 512 PTEs that map individual 4KB pages
 
 */
 
+#if ARCH(X86_64)
 gdt64:
     .quad 0
 gdt64code:
@@ -92,6 +93,7 @@ gdt64ptr:
 .global code64_sel
 code64_sel:
 .short code64_sel_value
+#endif
 
 start:
     jmp real_start
@@ -368,6 +370,8 @@ kernel_not_too_large:
     /* We should not return, but just in case, halt */
     hlt
 
+
+#if ARCH(X86_64)
 pae_supported:
     movl $0x80000001, %eax
     cpuid
@@ -389,6 +393,15 @@ long_mode_supported:
     popl %ebx
     popl %edx
     popl %eax
+#else
+/* If PAE is supported, continue with booting the system */
+
+pae_supported:
+    /* restore the pushed registers and continue with booting */
+    popl %ebx
+    popl %edx
+    popl %eax
+#endif
 
     /* We don't know where the bootloader might have put the command line.
      * It might be at an inconvenient location that we're not about to map,
@@ -403,6 +416,7 @@ long_mode_supported:
     movl $kernel_cmdline, %edi
     rep movsl
 
+#if ARCH(X86_64)
     /* clear pml4t */
     movl $boot_pml4t, %edi
     movl $1024, %ecx
@@ -414,6 +428,7 @@ long_mode_supported:
     movl $boot_pdpt, 0(%edi)
     /* R/W + Present */
     orl $0x3, 0(%edi)
+#endif
 
     /* clear pdpt */
     movl $boot_pdpt, %edi
@@ -421,16 +436,17 @@ long_mode_supported:
     xorl %eax, %eax
     rep stosl
 
-    /* set up pdpt[0]..pdpt[3] */
+    /* set up pdpt[0] and pdpt[3] */
     movl $boot_pdpt, %edi
+#if ARCH(X86_64)
     movl $(boot_pd0 + 3), 0(%edi)
-    movl $(boot_pd0 + 4096 + 3), 8(%edi)
-    movl $(boot_pd0 + 4096 * 2 + 3), 16(%edi)
-    movl $(boot_pd0 + 4096 * 3 + 3), 24(%edi)
+#else
+    movl $(boot_pd0 + 1), 0(%edi)
+#endif
 
     /* clear pd0 */
     movl $boot_pd0, %edi
-    movl $4096, %ecx
+    movl $1024, %ecx
     xorl %eax, %eax
     rep stosl
 
@@ -466,21 +482,13 @@ long_mode_supported:
     addl $4096, %eax
     loop 1b
 
-    /* Map the rest with 2MiB pages */
-    /* add boot_pd0_pts to boot_pd0 */
-    movl $(2048 - (MAX_KERNEL_SIZE >> 21)), %ecx
-    movl $(boot_pd0 + (MAX_KERNEL_SIZE >> 21) * 8), %edi
-    /* R/W + Present + 2 MiB */
-    movl $(MAX_KERNEL_SIZE | 0x83), %eax
-
-1:
-    movl %eax, 0(%edi)
-    addl $8, %edi
-    addl $(1 << 21), %eax
-    loop 1b
-
+#if ARCH(X86_64)
     /* point CR3 to PML4T */
     movl $boot_pml4t, %eax
+#else
+    /* point CR3 to PDPT */
+    movl $boot_pdpt, %eax
+#endif
 
     movl %eax, %cr3
 
@@ -489,12 +497,14 @@ long_mode_supported:
     orl $0x60, %eax
     movl %eax, %cr4
 
+#if ARCH(X86_64)
 1:
     /* Enter Long-mode! ref(https://wiki.osdev.org/Setting_Up_Long_Mode)*/
     mov $0xC0000080, %ecx           /* Set the C-register to 0xC0000080, which is the EFER MSR.*/
     rdmsr                           /* Read from the model-specific register.*/
     or $(1 << 8), %eax              /* Set the LM-bit which is the 9th bit (bit 8).*/
     wrmsr                           /* Write to the model-specific register.*/
+#endif
 
     /* enable PG */
     movl %cr0, %eax
@@ -505,6 +515,7 @@ long_mode_supported:
     mov $stack_top, %esp
     and $-16, %esp
 
+#if ARCH(X86_64)
     /* Now we are in 32-bit compatibility mode, We still need to load a 64-bit GDT */
     mov $gdt64ptr, %eax
     lgdt (%eax)
@@ -521,6 +532,9 @@ long_mode_supported:
     mov %ax, %es
     mov %ax, %fs
     mov %ax, %gs
+#else
+    movl %ebx, multiboot_info_ptr
+#endif
 
     call reload_cr3
     call init
@@ -531,10 +545,17 @@ loop:
     jmp loop
 
 reload_cr3:
+#if ARCH(X86_64)
     pushq %rax
     mov %cr3, %rax
     mov %rax, %cr3
     popq %rax
+#else
+    pushl %eax
+    movl %cr3, %eax
+    movl %eax, %cr3
+    popl %eax
+#endif
     ret
 
 

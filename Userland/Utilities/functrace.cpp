@@ -57,6 +57,14 @@ static void print_syscall(PtraceRegisters& regs, size_t depth)
         regs.rcx,
         regs.rbx,
         end_color);
+#elif ARCH(I386)
+    outln("=> {}SC_{}({:#x}, {:#x}, {:#x}){}",
+        begin_color,
+        Syscall::to_string((Syscall::Function)regs.eax),
+        regs.edx,
+        regs.ecx,
+        regs.ebx,
+        end_color);
 #elif ARCH(AARCH64)
     (void)regs;
     (void)begin_color;
@@ -144,6 +152,8 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
 
 #if ARCH(X86_64)
         FlatPtr const ip = regs.value().rip;
+#elif ARCH(I386)
+        FlatPtr const ip = regs.value().eip;
 #elif ARCH(AARCH64)
         FlatPtr const ip = 0; // FIXME
         TODO_AARCH64();

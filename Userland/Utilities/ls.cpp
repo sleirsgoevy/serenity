@@ -381,7 +381,7 @@ static bool print_filesystem_object(ByteString const& path, ByteString const& na
     else
         printf("%c", st.st_mode & S_IXOTH ? 'x' : '-');
 
-    printf(" %3lu", st.st_nlink);
+    printf(" %3" PRIu64, st.st_nlink);
 
     if (!flag_hide_owner) {
         auto username = users.get(st.st_uid);

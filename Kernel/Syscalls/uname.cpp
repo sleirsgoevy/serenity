@@ -13,6 +13,8 @@ namespace Kernel {
 
 #if ARCH(X86_64)
 #    define UNAME_MACHINE "x86_64"
+#elif ARCH(I386)
+#    define UNAME_MACHINE "i386"
 #elif ARCH(AARCH64)
 #    define UNAME_MACHINE "AArch64"
 #elif ARCH(RISCV64)

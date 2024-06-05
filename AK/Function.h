@@ -312,7 +312,7 @@ private:
     static constexpr size_t inline_capacity = 4 * sizeof(void*);
 #else
     // FIXME: Try to decrease this.
-    static constexpr size_t inline_capacity = 6 * sizeof(void*);
+    static constexpr size_t inline_capacity = 48; //6 * sizeof(void*);
 #endif
 
     alignas(inline_alignment) u8 m_storage[inline_capacity];

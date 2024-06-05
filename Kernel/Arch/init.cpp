@@ -66,7 +66,7 @@
 #include <Kernel/Time/TimeManagement.h>
 #include <Kernel/kstdio.h>
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/Hypervisor/VMWareBackdoor.h>
 #    include <Kernel/Arch/x86_64/Interrupts/APIC.h>
 #    include <Kernel/Arch/x86_64/Interrupts/PIC.h>
@@ -310,7 +310,7 @@ extern "C" [[noreturn]] UNMAP_AFTER_INIT NO_SANITIZE_COVERAGE void init([[maybe_
     VERIFY_NOT_REACHED();
 }
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 //
 // This is where C++ execution begins for APs, after boot.S transfers control here.
 //

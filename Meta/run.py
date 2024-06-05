@@ -37,6 +37,7 @@ class Arch(Enum):
     Aarch64 = "aarch64"
     RISCV64 = "riscv64"
     x86_64 = "x86_64"
+    i386 = "i386"
 
 
 @unique
@@ -304,6 +305,8 @@ def determine_serenity_arch() -> Arch:
         return Arch.RISCV64
     if arch == "x86_64":
         return Arch.x86_64
+    if arch == "i386":
+        return Arch.i386
     raise RunError("Please specify a valid SerenityOS architecture")
 
 
@@ -344,6 +347,8 @@ def set_up_qemu_binary(config: Configuration):
             qemu_binary_basename = "qemu-system-riscv64"
         elif config.architecture == Arch.x86_64:
             qemu_binary_basename = "qemu-system-x86_64"
+        elif config.architecture == Arch.i386:
+            qemu_binary_basename = "qemu-system-i386"
     if qemu_binary_basename is None:
         raise RunError("QEMU binary could not be determined")
 
@@ -696,6 +701,8 @@ def set_up_kernel(config: Configuration):
         config.kernel_and_initrd_arguments = ["-kernel", "Kernel/Kernel.bin"]
     elif config.architecture == Arch.x86_64:
         config.kernel_and_initrd_arguments = ["-kernel", "Kernel/Kernel"]
+    elif config.architecture == Arch.i386:
+        config.kernel_and_initrd_arguments = ["-kernel", "Kernel/Kernel"]
 
 
 def set_up_machine_devices(config: Configuration):
@@ -740,6 +747,11 @@ def set_up_machine_devices(config: Configuration):
             ]
         )
         return
+
+    #elif config.architecture == Arch.i386:
+        # Workaround for "Error loading uncompressed kernel without PVH ELF Note"
+        # See https://forum.osdev.org/viewtopic.php?f=1&t=33638
+        #config.qemu_machine = "type=pc-i440fx-3.1"
 
     # Machine specific base setups
     if config.machine_type in [MachineType.QEMU35Grub, MachineType.QEMU35]:

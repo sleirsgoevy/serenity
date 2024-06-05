@@ -212,8 +212,10 @@ int main(int argc, char** argv)
                 return Crash::Failure::UnexpectedError;
 
             u8* makeshift_stack_pointer = makeshift_stack + 2048;
-#if ARCH(X86_64)
+#if ARCH(I386)
             asm volatile("mov %%eax, %%esp" ::"a"(makeshift_stack_pointer));
+#elif ARCH(X86_64)
+            asm volatile("mov %%rax, %%rsp" ::"a"(makeshift_stack_pointer));
 #elif ARCH(AARCH64)
             (void)makeshift_stack_pointer;
             TODO_AARCH64();
@@ -230,8 +232,10 @@ int main(int argc, char** argv)
                 return Crash::Failure::UnexpectedError;
 
             u8* bad_stack_pointer = bad_stack + 2048;
-#if ARCH(X86_64)
+#if ARCH(I386)
             asm volatile("mov %%eax, %%esp" ::"a"(bad_stack_pointer));
+#elif ARCH(X86_64)
+            asm volatile("mov %%rax, %%rsp" ::"a"(bad_stack_pointer));
 #elif ARCH(AARCH64)
             (void)bad_stack_pointer;
             TODO_AARCH64();
@@ -252,8 +256,11 @@ int main(int argc, char** argv)
                 return Crash::Failure::UnexpectedError;
 
             u8* bad_stack_pointer = bad_stack + 2048;
-#if ARCH(X86_64)
-            asm volatile("movq %%rax, %%rsp" ::"a"(bad_stack_pointer));
+#if ARCH(I386)
+            asm volatile("mov %%eax, %%esp" ::"a"(bad_stack_pointer));
+            asm volatile("pushl $0");
+#elif ARCH(X86_64)
+            asm volatile("mov %%rax, %%rsp" ::"a"(bad_stack_pointer));
             asm volatile("pushq $0");
 #elif ARCH(AARCH64)
             (void)bad_stack_pointer;
@@ -291,7 +298,7 @@ int main(int argc, char** argv)
             if (ptr == MAP_FAILED)
                 return Crash::Failure::UnexpectedError;
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
             ptr[0] = 0xc3; // ret
 #elif ARCH(AARCH64)
             (void)ptr;
@@ -313,7 +320,7 @@ int main(int argc, char** argv)
 
     if (do_use_priviledged_instruction) {
         any_failures |= !Crash("Use a priviledged instruction in user mode", []() {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
             asm volatile("str %eax");
 #elif ARCH(AARCH64)
             TODO_AARCH64();

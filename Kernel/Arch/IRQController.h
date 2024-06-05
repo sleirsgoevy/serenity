@@ -8,7 +8,7 @@
 
 #include <AK/Platform.h>
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/IRQController.h>
 #elif ARCH(AARCH64)
 #    include <Kernel/Arch/aarch64/IRQController.h>

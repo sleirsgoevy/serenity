@@ -14,7 +14,7 @@
 namespace Kernel {
 
 enum class HardwareTimerType {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     i8253 = 0x1,                   /* PIT */
     RTC = 0x2,                     /* Real Time Clock */
     HighPrecisionEventTimer = 0x3, /* also known as IA-PC HPET */

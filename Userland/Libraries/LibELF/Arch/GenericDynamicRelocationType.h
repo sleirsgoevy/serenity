@@ -14,6 +14,8 @@
 #    include <Userland/Libraries/LibELF/Arch/riscv64/GenericDynamicRelocationType.h>
 #elif ARCH(X86_64)
 #    include <Userland/Libraries/LibELF/Arch/x86_64/GenericDynamicRelocationType.h>
+#elif ARCH(I386)
+#    include <Userland/Libraries/LibELF/Arch/i386/GenericDynamicRelocationType.h>
 #else
 #    error Unknown architecture
 #endif

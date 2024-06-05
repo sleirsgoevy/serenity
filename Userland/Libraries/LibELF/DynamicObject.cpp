@@ -28,7 +28,7 @@ DynamicObject::DynamicObject(ByteString const& filepath, VirtualAddress base_add
     for (size_t i = 0; i < program_header_count(); ++i) {
         auto pheader = phdrs[i];
         if (pheader.p_type == PT_LOAD) {
-            m_elf_base_address = VirtualAddress { pheader.p_vaddr - pheader.p_offset };
+            m_elf_base_address = VirtualAddress { (uintptr_t)(pheader.p_vaddr - pheader.p_offset) };
             break;
         }
 

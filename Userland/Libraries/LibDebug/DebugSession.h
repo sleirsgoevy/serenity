@@ -190,6 +190,8 @@ void DebugSession::run(DesiredInitialDebugeeState initial_debugee_state, Callbac
 
 #if ARCH(X86_64)
         FlatPtr current_instruction = regs.rip;
+#elif ARCH(I386)
+        FlatPtr current_instruction = regs.eip;
 #elif ARCH(AARCH64)
         FlatPtr current_instruction;
         TODO_AARCH64();
@@ -217,6 +219,8 @@ void DebugSession::run(DesiredInitialDebugeeState initial_debugee_state, Callbac
 
 #if ARCH(X86_64)
                 FlatPtr current_ebp = regs.rbp;
+#elif ARCH(I386)
+                FlatPtr current_ebp = regs.ebp;
 #elif ARCH(AARCH64)
                 FlatPtr current_ebp;
                 TODO_AARCH64();
@@ -270,6 +274,8 @@ void DebugSession::run(DesiredInitialDebugeeState initial_debugee_state, Callbac
             auto breakpoint_addr = bit_cast<FlatPtr>(current_breakpoint.value().address);
 #if ARCH(X86_64)
             regs.rip = breakpoint_addr;
+#elif ARCH(I386)
+            regs.eip = breakpoint_addr;
 #elif ARCH(AARCH64)
             (void)breakpoint_addr;
             TODO_AARCH64();

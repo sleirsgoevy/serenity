@@ -168,6 +168,8 @@ ErrorOr<Vector<NonnullOwnPtr<DebugInfo::VariableInfo>>> DebugInfo::get_variables
         FlatPtr ip;
 #if ARCH(X86_64)
         ip = regs.rip;
+#elif ARCH(I386)
+        ip = regs.eip;
 #elif ARCH(AARCH64)
         TODO_AARCH64();
 #elif ARCH(RISCV64)

@@ -126,6 +126,10 @@ is_valid_target() {
         CMAKE_ARGS+=("-DSERENITY_ARCH=riscv64")
         return 0
     fi
+    if [ "$TARGET" = "i386" ]; then
+        CMAKE_ARGS+=("-DSERENITY_ARCH=i386")
+        return 0
+    fi
     if [ "$TARGET" = "lagom" ]; then
         CMAKE_ARGS+=("-DBUILD_LAGOM=ON")
         if [ "${CMD_ARGS[0]}" = "ladybird" ]; then

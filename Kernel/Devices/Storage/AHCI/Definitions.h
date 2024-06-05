@@ -247,8 +247,8 @@ enum HBACapabilitiesExtended : u32 {
 
 // This structure is not defined by the AHCI spec, but is used within the code
 struct [[gnu::packed]] HBADefinedCapabilities {
-    size_t ports_count { 1 };
-    size_t max_command_list_entries_count { 1 };
+    uint64_t ports_count { 1 };
+    uint64_t max_command_list_entries_count { 1 };
     u8 interface_speed_generation { 1 };
     bool external_sata_supported : 1 { false };
     bool enclosure_management_supported : 1 { false };

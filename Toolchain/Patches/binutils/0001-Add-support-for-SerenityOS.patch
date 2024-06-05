@@ -47,6 +47,18 @@ index bdee53957c0ca034161715f86e84fcc950d7b625..dc97a5e4a57709736c62f4f4555dd92c
    aarch64-*-linux* | aarch64-*-netbsd* | aarch64-*-nto*)
      targ_defvec=aarch64_elf64_le_vec
      targ_selvecs="aarch64_elf64_be_vec aarch64_elf32_le_vec aarch64_elf32_be_vec arm_elf32_le_vec arm_elf32_be_vec aarch64_pei_le_vec aarch64_pe_le_vec"
+@@ -666,6 +671,11 @@ case "${targ}" in
+     targ_selvecs=
+     targ64_selvecs=x86_64_elf64_vec
+     ;;
++  i[3-7]86-*-serenity*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
+ #ifdef BFD64
+   x86_64-*-cloudabi*)
+     targ_defvec=x86_64_elf64_cloudabi_vec
 @@ -734,6 +739,11 @@ case "${targ}" in
      targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec"
      want64=true
@@ -240,9 +252,9 @@ index d1a5602643787c240b5323c6c09b9d2bbc813e79..b18a0ed9cede77b1665bb0716176091a
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ei386pep.Pc@am__quote@
 diff --git a/ld/configure.tgt b/ld/configure.tgt
 index c62b9581d9b8bb0bb000ff83247baa6144b9921b..6d0d7b2e0dee06be5c808aa933643e4c9eff0a7a 100644
---- a/ld/configure.tgt
-+++ b/ld/configure.tgt
-@@ -97,6 +97,9 @@ aarch64-*-freebsd*)	targ_emul=aarch64fbsd
+--- a/ld/configure.tgt	2023-07-03 02:00:00.000000000 +0300
++++ b/ld/configure.tgt	2024-06-05 22:12:40.143311299 +0300
+@@ -97,6 +97,9 @@
  aarch64-*-fuchsia*)	targ_emul=aarch64elf
  			targ_extra_emuls="aarch64elfb armelf armelfb"
  			;;
@@ -252,7 +264,17 @@ index c62b9581d9b8bb0bb000ff83247baa6144b9921b..6d0d7b2e0dee06be5c808aa933643e4c
  aarch64_be-*-linux-gnu_ilp32)
  			targ_emul=aarch64linux32b
  			targ_extra_libpath="aarch64linuxb aarch64linux aarch64linux32 armelfb_linux_eabi armelf_linux_eabi"
-@@ -825,6 +828,9 @@ riscv64*-*-linux*)	targ_emul=elf64lriscv
+@@ -378,6 +381,9 @@
+ i[3-7]86-*-redox*)	targ_emul=elf_i386
+ 			targ_extra_emuls=elf_x86_64
+ 			;;
++i[3-7]86-*-serenity*) targ_emul=elf_i386
++                      targ64_extra_emuls="elf_x86_64"
++                      ;;
+ i[3-7]86-*-solaris2*)	targ_emul=elf_i386_sol2
+ 			targ_extra_emuls="elf_i386_ldso elf_i386 elf_iamcu elf_x86_64_sol2 elf_x86_64"
+ 			targ_extra_libpath=$targ_extra_emuls
+@@ -825,6 +831,9 @@
  			targ_extra_emuls="elf64lriscv_lp64f elf64lriscv_lp64 elf32lriscv elf32lriscv_ilp32f elf32lriscv_ilp32 elf64briscv elf64briscv_lp64f elf64briscv_lp64 elf32briscv elf32briscv_ilp32f elf32briscv_ilp32"
  			targ_extra_libpath=$targ_extra_emuls
  			;;
@@ -262,7 +284,7 @@ index c62b9581d9b8bb0bb000ff83247baa6144b9921b..6d0d7b2e0dee06be5c808aa933643e4c
  riscv64be*-*-*)		targ_emul=elf64briscv
  			targ_extra_emuls="elf32briscv elf64lriscv elf32lriscv"
  			targ_extra_libpath=$targ_extra_emuls
-@@ -1011,6 +1017,9 @@ x86_64-*-linux-*)	targ_emul=elf_x86_64
+@@ -1011,6 +1020,9 @@
  x86_64-*-redox*)	targ_emul=elf_x86_64
  			targ_extra_emuls=elf_i386
  			;;
@@ -271,8 +293,7 @@ index c62b9581d9b8bb0bb000ff83247baa6144b9921b..6d0d7b2e0dee06be5c808aa933643e4c
 +			;;
  x86_64-*-solaris2*)	targ_emul=elf_x86_64_sol2
  			targ_extra_emuls="elf_x86_64 elf_i386_sol2 elf_i386_ldso elf_i386 elf_iamcu"
- 			targ_extra_libpath=$targ_extra_emuls
-diff --git a/ld/emulparams/aarch64serenity.sh b/ld/emulparams/aarch64serenity.sh
+ 			targ_extra_libpath=$targ_extra_emulsdiff --git a/ld/emulparams/aarch64serenity.sh b/ld/emulparams/aarch64serenity.sh
 new file mode 100644
 index 0000000000000000000000000000000000000000..23aed1440a033e2ac06536f43c1bacaf98832b92
 --- /dev/null

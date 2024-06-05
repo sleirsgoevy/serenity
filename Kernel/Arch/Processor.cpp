@@ -202,7 +202,7 @@ ErrorOr<Vector<FlatPtr, 32>> ProcessorBase<T>::capture_stack_trace(Thread& threa
         lock.unlock();
         TRY(capture_current_thread());
     } else if (thread.is_active()) {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
         VERIFY(thread.cpu() != Processor::current_id());
         // If this is the case, the thread is currently running
         // on another processor. We can't trust the kernel stack as

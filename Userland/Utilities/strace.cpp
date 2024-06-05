@@ -225,7 +225,11 @@ END_VALUES_TO_NAMES()
 
 static int g_pid = -1;
 
+#if ARCH(I386)
+using syscall_arg_t = u32;
+#else
 using syscall_arg_t = u64;
+#endif
 
 static void handle_sigint(int)
 {
@@ -948,6 +952,12 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
         syscall_arg_t arg2 = regs.rdi;
         syscall_arg_t arg3 = regs.rbx;
         syscall_arg_t arg4 = regs.rsi;
+#elif ARCH(I386)
+        syscall_arg_t syscall_index = regs.eax;
+        syscall_arg_t arg1 = regs.edx;
+        syscall_arg_t arg2 = regs.ecx;
+        syscall_arg_t arg3 = regs.ebx;
+        syscall_arg_t arg4 = 0;
 #elif ARCH(AARCH64)
         syscall_arg_t syscall_index = 0; // FIXME
         syscall_arg_t arg1 = 0;          // FIXME
@@ -976,6 +986,8 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
 
 #if ARCH(X86_64)
         u64 res = regs.rax;
+#elif ARCH(I386)
+        u32 res = regs.eax;
 #elif ARCH(AARCH64)
         u64 res = 0; // FIXME
         TODO_AARCH64();

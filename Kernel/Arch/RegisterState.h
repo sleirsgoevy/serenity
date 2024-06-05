@@ -8,7 +8,9 @@
 
 #include <AK/Platform.h>
 
-#if ARCH(X86_64)
+#if ARCH(I386)
+#    include <Kernel/Arch/i386/RegisterState.h>
+#elif ARCH(X86_64)
 #    include <Kernel/Arch/x86_64/RegisterState.h>
 #elif ARCH(AARCH64)
 #    include <Kernel/Arch/aarch64/RegisterState.h>

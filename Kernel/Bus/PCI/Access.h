@@ -22,7 +22,7 @@ class Access {
 public:
     static bool initialize_for_multiple_pci_domains(PhysicalAddress mcfg_table);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     static bool initialize_for_one_pci_domain();
 #endif
 

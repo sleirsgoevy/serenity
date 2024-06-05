@@ -125,7 +125,7 @@ ErrorOr<void> Coredump::write_elf_header()
     elf_file_header.e_ident[EI_MAG1] = 'E';
     elf_file_header.e_ident[EI_MAG2] = 'L';
     elf_file_header.e_ident[EI_MAG3] = 'F';
-#if ARCH(X86_64) || ARCH(AARCH64) || ARCH(RISCV64)
+#if ARCH(X86_64) || ARCH(I386) || ARCH(AARCH64) || ARCH(RISCV64)
     elf_file_header.e_ident[EI_CLASS] = ELFCLASS64;
 #else
 #    error Unknown architecture
@@ -143,6 +143,8 @@ ErrorOr<void> Coredump::write_elf_header()
     elf_file_header.e_type = ET_CORE;
 #if ARCH(X86_64)
     elf_file_header.e_machine = EM_X86_64;
+#elif ARCH(I386)
+    elf_file_header.e_machine = EM_386;
 #elif ARCH(AARCH64)
     elf_file_header.e_machine = EM_AARCH64;
 #elif ARCH(RISCV64)

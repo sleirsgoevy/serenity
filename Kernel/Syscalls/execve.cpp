@@ -147,7 +147,16 @@ static ErrorOr<FlatPtr> make_userspace_context_for_main_thread([[maybe_unused]] 
     // NOTE: The stack needs to be 16-byte aligned.
     new_sp -= new_sp % 16;
 
-#if ARCH(X86_64)
+#if ARCH(I386)
+    // GCC assumes that the return address has been pushed to the stack when it enters the function,
+    // so we need to reserve an extra pointer's worth of bytes below this to make GCC's stack alignment
+    // calculations work
+    new_sp -= sizeof(void*);
+
+    push_on_new_stack(envp);
+    push_on_new_stack(argv);
+    push_on_new_stack(argv_entries.size());
+#elif ARCH(X86_64)
     regs.rdi = argv_entries.size();
     regs.rsi = argv;
     regs.rdx = envp;
@@ -675,7 +684,7 @@ static Array<ELF::AuxiliaryValue, auxiliary_vector_size> generate_auxiliary_vect
 
         { ELF::AuxiliaryValue::Platform, Processor::platform_string() },
     // FIXME: This is platform specific
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
         { ELF::AuxiliaryValue::HwCap, (long)CPUID(1).edx() },
 #elif ARCH(AARCH64)
         { ELF::AuxiliaryValue::HwCap, (long)0 },

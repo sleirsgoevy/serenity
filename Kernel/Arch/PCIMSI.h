@@ -9,7 +9,7 @@
 #include <AK/Types.h>
 
 namespace Kernel {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 u64 msi_address_register(u8 destination_id, bool redirection_hint, bool destination_mode);
 u32 msi_data_register(u8 vector, bool level_trigger, bool assert);
 u32 msix_vector_control_register(u32 vector_control, bool mask);

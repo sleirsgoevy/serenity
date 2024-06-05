@@ -32,7 +32,7 @@ NAKED void _start(int, char**, char**)
         "li fp, 0\n"
         "li ra, 0\n"
         "tail _entry@plt\n");
-#    elif ARCH(X86_64)
+#    elif ARCH(X86_64) || ARCH(I386)
     asm(
         "push $0\n"
         "jmp _entry@plt\n");
@@ -51,5 +51,17 @@ int _entry(int argc, char** argv)
 
     return 20150614;
 }
+}
+#endif
+
+#if ARCH(I386)
+//__stack_chk_fail_local is forced by GCC to be a hidden symbol
+//this means that it must be present in every library, and not just included in libc.so
+
+extern "C" [[gnu::noreturn, gnu::no_stack_protector]] void __stack_chk_fail();
+
+extern "C" [[gnu::noreturn, gnu::no_stack_protector]] void __stack_chk_fail_local()
+{
+    __stack_chk_fail();
 }
 #endif

@@ -15,7 +15,7 @@
 //        (2) Implement prev_irq in the assembly stubs of Aarch64 and RISC-V
 //        and then use the same TrapFrame on all architectures.
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/TrapFrame.h>
 #elif ARCH(AARCH64)
 #    include <Kernel/Arch/aarch64/TrapFrame.h>

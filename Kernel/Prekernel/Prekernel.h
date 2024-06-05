@@ -25,7 +25,7 @@ extern "C" multiboot_info_t* multiboot_info_ptr;
 
 namespace Kernel {
 
-#    if ARCH(X86_64)
+#    if ARCH(X86_64) || ARCH(I386)
 struct [[gnu::packed]] BootInfo {
     u32 start_of_prekernel_image;
     u32 end_of_prekernel_image;

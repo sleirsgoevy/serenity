@@ -118,8 +118,8 @@ void SDHostController::try_enable_dma()
                 m_registers->host_configuration_0 = m_registers->host_configuration_0 | dma_select_adma2_64;
             } else {
                 // FIXME: Use a way that guarantees memory addresses below the 32 bit threshold
-                VERIFY(m_dma_region->physical_page(0)->paddr().get() >> 32 == 0);
-                VERIFY(m_dma_region->physical_page(dma_region_size / PAGE_SIZE - 1)->paddr().get() >> 32 == 0);
+                VERIFY(m_dma_region->physical_page(0)->paddr().get() < 0x100000000);
+                VERIFY(m_dma_region->physical_page(dma_region_size / PAGE_SIZE - 1)->paddr().get() < 0x100000000);
 
                 dbgln("Setting SDHostController to operate using ADMA2 with 32 bit addressing");
                 m_mode = OperatingMode::ADMA2_32;
@@ -646,7 +646,7 @@ u32 SDHostController::make_adma_descriptor_table(u32 block_count)
         Array<SD::DMADescriptor64, 64>& command_buffer = *bit_cast<Array<SD::DMADescriptor64, 64>*>(adma_descriptor_virtual);
         for (; i < 64; ++i) {
             FlatPtr physical_transfer_address = adma_dma_region_physical + offset;
-            VERIFY(physical_transfer_address >> 32 == 0);
+            VERIFY(physical_transfer_address < 0x100000000);
             // If the remaining block count is less than the maximum addressable blocks
             // we need to set the actual length and break out of the loop
             if (block_count - blocks_transferred < blocks_per_descriptor) {
@@ -686,7 +686,7 @@ u32 SDHostController::make_adma_descriptor_table(u32 block_count)
         Array<SD::DMADescriptor128, 32>& command_buffer = *bit_cast<Array<SD::DMADescriptor128, 32>*>(adma_descriptor_virtual);
         for (; i < 32; ++i) {
             FlatPtr physical_transfer_address = adma_dma_region_physical + offset;
-            VERIFY(physical_transfer_address >> 32 == 0);
+            VERIFY(physical_transfer_address < 0x100000000);
             // If the remaining block count is less than the maximum addressable blocks
             // we need to set the actual length and break out of the loop
             if (block_count - blocks_transferred < blocks_per_descriptor) {
@@ -698,8 +698,8 @@ u32 SDHostController::make_adma_descriptor_table(u32 block_count)
                     .action = SD::DMAAction::Tran,
                     .length_upper = 0,
                     .length_lower = static_cast<u32>(blocks_to_read * block_len),
-                    .address_low = static_cast<u32>((physical_transfer_address + offset) & 0xFFFF'FFFF),
-                    .address_high = static_cast<u32>((physical_transfer_address + offset) >> 32),
+                    .address_low = static_cast<u32>((physical_transfer_address + (uint64_t)offset) & 0xFFFF'FFFF),
+                    .address_high = static_cast<u32>((physical_transfer_address + (uint64_t)offset) >> 32),
                 };
                 blocks_transferred += blocks_to_read;
                 offset += static_cast<size_t>(blocks_to_read) * block_len;
@@ -713,8 +713,8 @@ u32 SDHostController::make_adma_descriptor_table(u32 block_count)
                 .action = SD::DMAAction::Tran,
                 .length_upper = 0,
                 .length_lower = 0, // length of 0 means 1<<16 bytes
-                .address_low = static_cast<u32>((physical_transfer_address + offset) & 0xFFFF'FFFF),
-                .address_high = static_cast<u32>((physical_transfer_address + offset) >> 32),
+                .address_low = static_cast<u32>((physical_transfer_address + (uint64_t)offset) & 0xFFFF'FFFF),
+                .address_high = static_cast<u32>((physical_transfer_address + (uint64_t)offset) >> 32),
             };
 
             blocks_transferred += blocks_per_descriptor;
@@ -769,7 +769,7 @@ ErrorOr<void> SDHostController::transfer_blocks_adma2(u32 block_address, u32 blo
         // (2) Set the Descriptor address for ADMA in the ADMA System Address register.
         m_registers->adma_system_address[0] = static_cast<u32>(adma_descriptor_physical & 0xFFFF'FFFF);
         if (m_mode == ADMA2_64)
-            m_registers->adma_system_address[1] = static_cast<u32>(adma_descriptor_physical >> 32);
+            m_registers->adma_system_address[1] = static_cast<u32>((uint64_t)adma_descriptor_physical >> 32);
 
         // (3) Set the value corresponding to the executed data byte length of one block in the Block Size
         //     register.

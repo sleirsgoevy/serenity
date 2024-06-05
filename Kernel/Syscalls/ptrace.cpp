@@ -230,7 +230,7 @@ ErrorOr<void> Process::poke_user_data(Userspace<FlatPtr*> address, FlatPtr data)
 
 ErrorOr<FlatPtr> Thread::peek_debug_register(u32 register_index)
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     FlatPtr data;
     switch (register_index) {
     case 0:
@@ -268,7 +268,7 @@ ErrorOr<FlatPtr> Thread::peek_debug_register(u32 register_index)
 
 ErrorOr<void> Thread::poke_debug_register(u32 register_index, FlatPtr data)
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     switch (register_index) {
     case 0:
         m_debug_register_state.dr0 = data;

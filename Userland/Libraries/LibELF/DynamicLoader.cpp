@@ -510,7 +510,7 @@ DynamicLoader::RelocationResult DynamicLoader::do_direct_relocation(DynamicObjec
         patch_ptr = (FlatPtr*)(FlatPtr)relocation.offset();
 
     auto call_ifunc_resolver = [](VirtualAddress address) {
-        return VirtualAddress { reinterpret_cast<DynamicObject::IfuncResolver>(address.get())() };
+        return VirtualAddress { (uintptr_t)reinterpret_cast<DynamicObject::IfuncResolver>(address.get())() };
     };
 
     auto lookup_symbol = [&](DynamicObject::Symbol const& symbol) {
@@ -708,10 +708,10 @@ DynamicLoader::RelocationResult DynamicLoader::do_plt_relocation(DynamicObject::
 //        To temporarily disable UBsan an IIFE is needed, as sanitizers aren't diagnostics...
 #ifdef AK_COMPILER_CLANG
             [&] [[clang::no_sanitize("undefined")]] {
-                symbol_location = VirtualAddress { reinterpret_cast<DynamicObject::IfuncResolver>(address.get())() };
+                symbol_location = VirtualAddress { (uintptr_t)reinterpret_cast<DynamicObject::IfuncResolver>(address.get())() };
             }();
 #else
-            symbol_location = VirtualAddress { reinterpret_cast<DynamicObject::IfuncResolver>(address.get())() };
+            symbol_location = VirtualAddress { (uintptr_t)reinterpret_cast<DynamicObject::IfuncResolver>(address.get())() };
 #endif
         } else {
             symbol_location = address;
@@ -775,7 +775,7 @@ void DynamicLoader::setup_plt_trampoline()
 
     auto* got_ptr = (FlatPtr*)got_address.as_ptr();
 
-#if ARCH(AARCH64) || ARCH(X86_64)
+#if ARCH(AARCH64) || ARCH(X86_64) || ARCH(I386)
     got_ptr[1] = (FlatPtr)m_dynamic_object.ptr();
     got_ptr[2] = (FlatPtr)&_plt_trampoline;
 #elif ARCH(RISCV64)

@@ -229,10 +229,19 @@ extern "C" [[noreturn]] void init()
     info.boot_pd_kernel_pt1023 = (FlatPtr)adjust_by_mapping_base(boot_pd_kernel_pt1023);
     info.kernel_cmdline = (FlatPtr)adjust_by_mapping_base(kernel_cmdline);
 
+#if ARCH(X86_64)
     asm(
         "mov %0, %%rax\n"
         "add %%rax, %%rsp" ::"g"(kernel_mapping_base)
         : "ax");
+#elif ARCH(I386)
+    asm(
+        "mov %0, %%eax\n"
+        "add %%eax, %%esp" ::"g"(kernel_mapping_base)
+        : "ax");
+#else
+#error Unknown architecture!
+#endif
 
     // unmap the 0-1MB region
     for (size_t i = 0; i < 256; i++)

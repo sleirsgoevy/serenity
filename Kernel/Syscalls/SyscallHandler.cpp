@@ -102,7 +102,7 @@ ErrorOr<FlatPtr> handle(RegisterState& regs, FlatPtr function, FlatPtr arg1, Fla
 extern "C" NEVER_INLINE void syscall_handler(TrapFrame* trap);
 NEVER_INLINE void syscall_handler(TrapFrame* trap)
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     // Make sure SMAP protection is enabled on syscall entry.
     clac();
 #elif ARCH(AARCH64)
@@ -131,7 +131,7 @@ NEVER_INLINE void syscall_handler(TrapFrame* trap)
 
     current_thread->yield_if_should_be_stopped();
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     // Apply a random offset in the range 0-255 to the stack pointer,
     // to make kernel stacks a bit less deterministic.
     u32 lsw;

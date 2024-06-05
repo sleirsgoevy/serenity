@@ -9,7 +9,11 @@
 #include <AK/Atomic.h>
 #include <AK/Vector.h>
 
+#if ARCH(I386)
+#include <Kernel/Arch/i386/DescriptorTable.h>
+#else
 #include <Kernel/Arch/x86_64/DescriptorTable.h>
+#endif
 
 #include <AK/Platform.h>
 VALIDATE_IS_X86()

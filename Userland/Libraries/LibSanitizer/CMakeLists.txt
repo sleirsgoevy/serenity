@@ -5,7 +5,7 @@ set(SOURCES
 
 serenity_libc(LibUBSanitizer ubsan)
 add_dependencies(LibUBSanitizer install_libc_headers)
-target_link_options(LibUBSanitizer PRIVATE -nostdlib)
+target_link_options(LibUBSanitizer PRIVATE -nostdlib -l:crt0_shared.o)
 
 add_library(DynamicLoader_LibUBSanitizer STATIC UBSanitizer.cpp)
 target_link_libraries(DynamicLoader_LibUBSanitizer PUBLIC DynamicLoader_CompileOptions)

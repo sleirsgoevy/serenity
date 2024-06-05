@@ -24,8 +24,8 @@ public:
         size_t h_len = hash.digest_size();
 
         // 1. If length > 2^32(hLen), output "mask too long" and stop.
-        if constexpr (sizeof(size_t) > 32) {
-            if (length > (h_len << 32))
+        if constexpr (sizeof(size_t) > 4) {
+            if (length > (h_len << (sizeof(size_t) > 4 ? 32 : 0)))
                 return Error::from_string_view("mask too long"sv);
         }
 

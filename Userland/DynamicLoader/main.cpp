@@ -138,7 +138,7 @@ NAKED void _start(int, char**, char**)
         "li fp, 0\n"
         "li ra, 0\n"
         "tail _entry@plt\n");
-#elif ARCH(X86_64)
+#elif ARCH(X86_64) || ARCH(I386)
     asm(
         "push $0\n"
         "jmp _entry@plt\n");

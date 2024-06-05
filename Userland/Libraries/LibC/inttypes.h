@@ -12,8 +12,13 @@
 
 __BEGIN_DECLS
 
-#define __PRI64_PREFIX "l"
-#define __PRIPTR_PREFIX "l"
+#ifdef __i386__
+#    define __PRI64_PREFIX "ll"
+#    define __PRIPTR_PREFIX
+#else
+#    define __PRI64_PREFIX "l"
+#    define __PRIPTR_PREFIX "l"
+#endif
 
 #define PRId8 "d"
 #define PRId16 "d"

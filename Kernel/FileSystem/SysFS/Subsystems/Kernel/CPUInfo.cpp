@@ -5,7 +5,7 @@
  */
 
 #include <AK/JsonObjectSerializer.h>
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/ProcessorInfo.h>
 #endif
 #include <Kernel/FileSystem/SysFS/Subsystems/Kernel/CPUInfo.h>
@@ -25,7 +25,7 @@ UNMAP_AFTER_INIT NonnullRefPtr<SysFSCPUInformation> SysFSCPUInformation::must_cr
 
 ErrorOr<void> SysFSCPUInformation::try_generate(KBufferBuilder& builder)
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     auto array = TRY(JsonArraySerializer<>::try_create(builder));
     TRY(Processor::try_for_each(
         [&](Processor& proc) -> ErrorOr<void> {

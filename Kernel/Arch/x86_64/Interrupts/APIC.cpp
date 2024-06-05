@@ -216,8 +216,10 @@ extern "C" FlatPtr ap_cpu_init_cr3;
 extern "C" u32 ap_cpu_init_cr4;
 extern "C" FlatPtr ap_cpu_gdtr;
 extern "C" FlatPtr ap_cpu_idtr;
+#if !ARCH(I386)
 extern "C" FlatPtr ap_cpu_kernel_map_base;
 extern "C" FlatPtr ap_cpu_kernel_entry_function;
+#endif
 
 extern "C" [[noreturn]] void init_ap(FlatPtr, Processor*);
 
@@ -384,8 +386,10 @@ UNMAP_AFTER_INIT void APIC::setup_ap_boot_environment()
     auto const& idtr = get_idtr();
     *APIC_INIT_VAR_PTR(FlatPtr, apic_startup_region_ptr, ap_cpu_idtr) = FlatPtr(&idtr);
 
+#if !ARCH(I386)
     *APIC_INIT_VAR_PTR(FlatPtr, apic_startup_region_ptr, ap_cpu_kernel_map_base) = FlatPtr(kernel_mapping_base);
     *APIC_INIT_VAR_PTR(FlatPtr, apic_startup_region_ptr, ap_cpu_kernel_entry_function) = FlatPtr(&init_ap);
+#endif
 
     // Store the BSP's CR0 and CR4 values for the APs to use
     *APIC_INIT_VAR_PTR(FlatPtr, apic_startup_region_ptr, ap_cpu_init_cr0) = read_cr0();

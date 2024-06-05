@@ -24,4 +24,12 @@ void* __tls_get_addr(__tls_index* index)
 {
     return reinterpret_cast<void*>(reinterpret_cast<FlatPtr>(__builtin_thread_pointer()) + index->ti_module + index->ti_offset + ELF::TLS_DTV_OFFSET);
 }
+
+#if ARCH(I386)
+extern "C" void* ___tls_get_addr(__tls_index* index);
+extern "C" void* ___tls_get_addr(__tls_index* index)
+{
+    return __tls_get_addr(index);
+}
+#endif
 }

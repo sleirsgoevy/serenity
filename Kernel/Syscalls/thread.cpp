@@ -70,6 +70,9 @@ ErrorOr<FlatPtr> Process::sys$create_thread(void* (*entry)(void*), Userspace<Sys
     regs.rcx = (FlatPtr)params.stack_size;
 
     thread->arch_specific_data().fs_base = bit_cast<FlatPtr>(params.tls_pointer);
+#elif ARCH(I386)
+    regs.set_flags(0x0202);
+    regs.cr3 = address_space().with([](auto& space) { return space->page_directory().cr3(); });
 #elif ARCH(AARCH64)
     regs.ttbr0_el1 = address_space().with([](auto& space) { return space->page_directory().ttbr0(); });
 

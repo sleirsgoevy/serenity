@@ -197,6 +197,18 @@ constexpr size_t align_down_to(size_t const value, size_t const alignment)
     return value & ~(alignment - 1);
 }
 
+#if ARCH(I386) //XXX: generic constraint?
+constexpr uint64_t align_up_to(uint64_t const value, uint64_t const alignment)
+{
+    return (value + (alignment - 1)) & ~(alignment - 1);
+}
+
+constexpr uint64_t align_down_to(uint64_t const value, uint64_t const alignment)
+{
+    return value & ~(alignment - 1);
+}
+#endif
+
 enum class [[nodiscard]] TriState : u8 {
     False,
     True,

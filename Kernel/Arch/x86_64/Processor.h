@@ -15,11 +15,16 @@
 #include <Kernel/Arch/DeferredCallEntry.h>
 #include <Kernel/Arch/DeferredCallPool.h>
 #include <Kernel/Arch/ProcessorSpecificDataID.h>
+#if ARCH(I386)
+#include <Kernel/Arch/i386/DescriptorTable.h>
+#include <Kernel/Arch/i386/TSS.h>
+#else
+#include <Kernel/Arch/x86_64/DescriptorTable.h>
+#include <Kernel/Arch/x86_64/TSS.h>
+#endif
 #include <Kernel/Arch/x86_64/ASM_wrapper.h>
 #include <Kernel/Arch/x86_64/CPUID.h>
-#include <Kernel/Arch/x86_64/DescriptorTable.h>
 #include <Kernel/Arch/x86_64/SIMDState.h>
-#include <Kernel/Arch/x86_64/TSS.h>
 #include <Kernel/Forward.h>
 #include <Kernel/Library/KString.h>
 
@@ -147,7 +152,11 @@ public:
     }
     static constexpr u64 kernel_stack_offset()
     {
+#if ARCH(I386)
+        return __builtin_offsetof(Processor, m_tss) + __builtin_offsetof(TSS, esp0);
+#else
         return __builtin_offsetof(Processor, m_tss) + __builtin_offsetof(TSS, rsp0l);
+#endif
     }
 
     bool smp_process_pending_messages();
