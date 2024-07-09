@@ -519,12 +519,13 @@ elseif("${SERENITY_ARCH}" STREQUAL "i386")
     set(KERNEL_SOURCES
         ${KERNEL_SOURCES}
         
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/atomics.S
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/ASM_wrapper.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/CPU.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/CPUID.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/InterruptManagement.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/Interrupts.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/PageDirectory.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/PageDirectory.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/Processor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/ProcessorInfo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/SafeMem.cpp
@@ -710,7 +711,7 @@ add_compile_options(-fno-rtti -ffreestanding -fbuiltin)
 # This is an issue on non-Itanium ABIs (and in irrelevant edge cases), so we can safely ignore it.
 add_compile_options(-Wno-invalid-offsetof)
 
-if ("${SERENITY_ARCH}" STREQUAL "x86_64")
+if ("${SERENITY_ARCH}" STREQUAL "x86_64" OR "${SERENITY_ARCH}" STREQUAL "i386")
     add_compile_options(-mno-80387 -mno-mmx -mno-sse -mno-sse2)
 elseif("${SERENITY_ARCH}" STREQUAL "aarch64")
     add_compile_options(-mgeneral-regs-only)

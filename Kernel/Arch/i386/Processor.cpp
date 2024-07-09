@@ -1525,14 +1525,25 @@ FlatPtr ProcessorBase<T>::init_context(Thread& thread, bool leave_crit)
     auto& regs = thread.regs();
     bool return_to_user = (regs.cs & 3) != 0;
 
-    stack_top -= 1 * sizeof(u64);
-    *reinterpret_cast<u64*>(kernel_stack_top - 2 * sizeof(u64)) = FlatPtr(&exit_kernel_thread);
+    // make room for an interrupt frame
+    if (!return_to_user) {
+        // userspace_esp and userspace_ss are not popped off by iret
+        // unless we're switching back to user mode
+        stack_top -= sizeof(RegisterState) - 2 * sizeof(u32);
 
-    stack_top -= sizeof(RegisterState);
+        // For kernel threads we'll push the thread function argument
+        // which should be in regs.esp and exit_kernel_thread as return
+        // address.
+        stack_top -= 2 * sizeof(u32);
+        *reinterpret_cast<u32*>(kernel_stack_top - 2 * sizeof(u32)) = regs.esp;
+        *reinterpret_cast<u32*>(kernel_stack_top - 3 * sizeof(u32)) = FlatPtr(&exit_kernel_thread);
+    } else {
+        stack_top -= sizeof(RegisterState);
+    }
 
     // we want to end up 16-byte aligned, %rsp + 8 should be aligned
-    stack_top -= sizeof(u64);
-    *reinterpret_cast<u64*>(kernel_stack_top - sizeof(u64)) = 0;
+    stack_top -= sizeof(u32);
+    *reinterpret_cast<u32*>(kernel_stack_top - sizeof(u32)) = 0;
 
     // set up the stack so that after returning from thread_context_first_enter()
     // we will end up either in kernel mode or user mode, depending on how the thread is set up
@@ -1566,8 +1577,8 @@ FlatPtr ProcessorBase<T>::init_context(Thread& thread, bool leave_crit)
     trap.prev_irq_level = 0;
     trap.next_trap = nullptr;
 
-    stack_top -= sizeof(u64); // pointer to TrapFrame
-    *reinterpret_cast<u64*>(stack_top) = stack_top + 8;
+    stack_top -= sizeof(u32); // pointer to TrapFrame
+    *reinterpret_cast<u32*>(stack_top) = stack_top + 4;
 
     if constexpr (CONTEXT_SWITCH_DEBUG) {
         if (return_to_user) {
@@ -1684,20 +1695,22 @@ UNMAP_AFTER_INIT void ProcessorBase<T>::initialize_context_switching(Thread& ini
         "pushl %[new_eip] \n" // save the entry eip to the stack
         "movl %%esp, %%ebx \n"
         "addl $20, %%ebx \n" // calculate pointer to TrapFrame
+        "mov %[regs], 8(%%ebx) \n" // set 
         "pushl %%ebx \n"
         "cld \n"
         "pushl %[cpu] \n" // push argument for init_finished before register is clobbered
         "call pre_init_finished \n"
         "call init_finished \n"
-        "addl $4, %%esp \n"
         "call post_init_finished \n"
+        "addl $4, %%esp \n"
         "call enter_trap_no_irq \n"
         "addl $4, %%esp \n"
         "lret \n"
         :: [new_esp] "g" (regs.esp),
            [new_eip] "a" (regs.eip),
            [from_to_thread] "b" (&initial_thread),
-           [cpu] "c" (Processor::current_id())
+           [cpu] "c" (Processor::current_id()),
+           [regs] "d" (&regs)
     );
     // clang-format on
 

@@ -72,10 +72,12 @@ static EntropySource s_entropy_source_interrupts { EntropySource::Static::Interr
             "    mov %%ax, %%gs\n"                                               \
             "    pushl %%esp \n" /* set TrapFrame::regs */                       \
             "    subl %2, %%esp \n"                                              \
-            "    pushl %%esp \n"                                                 \
+            "    movl %%esp, %%ebx \n"                                           \
+            "    pushl %%ebx \n"                                                 \
             "    cld\n"                                                          \
             "    call enter_trap_no_irq \n"                                      \
             "    call " #title "_handler\n"                                      \
+            "    movl %%ebx, (%%esp) \n"                                         \
             "    jmp common_trap_exit \n"                                        \
         ::"i"(GDT_SELECTOR_DATA0),"i"(GDT_SELECTOR_PROC),"i"(TRAP_FRAME_SIZE-4));\
     }
@@ -99,10 +101,12 @@ static EntropySource s_entropy_source_interrupts { EntropySource::Static::Interr
             "    mov %%ax, %%gs\n"                                               \
             "    pushl %%esp \n" /* set TrapFrame::regs */                       \
             "    subl %2, %%esp \n"                                              \
-            "    pushl %%esp \n"                                                 \
+            "    movl %%esp, %%ebx \n"                                           \
+            "    pushl %%ebx \n"                                                 \
             "    cld\n"                                                          \
             "    call enter_trap_no_irq \n"                                      \
             "    call " #title "_handler\n"                                      \
+            "    movl %%ebx, (%%esp) \n"                                         \
             "    jmp common_trap_exit \n"                                        \
         ::"i"(GDT_SELECTOR_DATA0),"i"(GDT_SELECTOR_PROC),"i"(TRAP_FRAME_SIZE-4));\
     }

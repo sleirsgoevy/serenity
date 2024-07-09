@@ -42,9 +42,9 @@ namespace Kernel {
 
 ALWAYS_INLINE bool validate_canonical_address(size_t address)
 {
-    auto most_significant_bits = Processor::current().virtual_address_bit_width() - 1;
-    auto insignificant_bits = address >> most_significant_bits;
-    return insignificant_bits == 0 || insignificant_bits == (0xffffffffffffffffull >> most_significant_bits);
+    //i386 does not have the concept of a canonical address, all addresses are valid
+    (void)address;
+    return true;
 }
 
 CODE_SECTION(".text.safemem")

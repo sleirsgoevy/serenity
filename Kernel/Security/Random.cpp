@@ -7,7 +7,7 @@
 
 #include <AK/Singleton.h>
 #include <Kernel/Arch/Processor.h>
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/Time/HPET.h>
 #    include <Kernel/Arch/x86_64/Time/RTC.h>
 #elif ARCH(AARCH64)
@@ -30,7 +30,7 @@ KernelRng& KernelRng::the()
 
 UNMAP_AFTER_INIT KernelRng::KernelRng()
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (Processor::current().has_feature(CPUFeature::RDSEED)) {
         dmesgln("KernelRng: Using RDSEED as entropy source");
 

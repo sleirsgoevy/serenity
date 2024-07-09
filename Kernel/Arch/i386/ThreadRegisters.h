@@ -60,10 +60,14 @@ struct ThreadRegisters {
         // Only IF is set when a process boots.
         set_flags(0x0202);
 
-        if (is_kernel_process)
+        if (is_kernel_process) {
             cs = GDT_SELECTOR_CODE0;
-        else
+            ds = es = ss = fs = GDT_SELECTOR_DATA0;
+            gs = GDT_SELECTOR_PROC;
+        } else {
             cs = GDT_SELECTOR_CODE3 | 3;
+            ds = es = ss = GDT_SELECTOR_DATA3 | 3;
+        }
 
         cr3 = space.page_directory().cr3();
 
@@ -80,21 +84,18 @@ struct ThreadRegisters {
     void set_entry_function(FlatPtr entry_ip, FlatPtr entry_data)
     {
         set_ip(entry_ip);
-        (void)entry_data;
-        TODO();
-        //rdi = entry_data; // entry function argument is expected to be in regs.rdi
+
+        // This will be pushed to stack later in Processor::init_context
+        // For now, fake a register-based calling convention
+        esp = entry_data;
     }
 
     void set_exec_state(FlatPtr entry_ip, FlatPtr userspace_sp, Memory::AddressSpace& space)
     {
         cs = GDT_SELECTOR_CODE3 | 3;
-        (void)entry_ip;
-        (void)userspace_sp;
-        (void)space;
-        TODO();
-        //rip = entry_ip;
-        //rsp = userspace_sp;
-        //cr3 = space.page_directory().cr3();
+        eip = entry_ip;
+        esp = userspace_sp;
+        cr3 = space.page_directory().cr3();
     }
 };
 

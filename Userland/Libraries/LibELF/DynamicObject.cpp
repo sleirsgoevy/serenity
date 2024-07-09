@@ -32,7 +32,7 @@ DynamicObject::DynamicObject(ByteString const& filepath, VirtualAddress base_add
             break;
         }
 
-        if (i == program_header_count() - 1) {
+        if (i == program_header_count() - 1u) {
             VERIFY_NOT_REACHED();
         }
     }

@@ -164,14 +164,16 @@ Atomic<Graphics::Console*> g_boot_console;
 
 extern "C" [[noreturn]] UNMAP_AFTER_INIT NO_SANITIZE_COVERAGE void init([[maybe_unused]] BootInfo const& boot_info)
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     start_of_prekernel_image = PhysicalAddress { boot_info.start_of_prekernel_image };
     end_of_prekernel_image = PhysicalAddress { boot_info.end_of_prekernel_image };
     physical_to_virtual_offset = boot_info.physical_to_virtual_offset;
     kernel_mapping_base = boot_info.kernel_mapping_base;
     kernel_load_base = boot_info.kernel_load_base;
+#if ARCH(X86_64)
     gdt64ptr = boot_info.gdt64ptr;
     code64_sel = boot_info.code64_sel;
+#endif
     boot_pml4t = PhysicalAddress { boot_info.boot_pml4t };
     boot_pdpt = PhysicalAddress { boot_info.boot_pdpt };
     boot_pd0 = PhysicalAddress { boot_info.boot_pd0 };

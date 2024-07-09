@@ -17,7 +17,11 @@
 
 // FIXME: This should be using the define from Sections.h, but that currently is not possible
 //        and causes linker errors, because Sections.h includes BootInfo.h.
-#define KERNEL_MAPPING_BASE 0x2000000000
+#if ARCH(I386)
+#    define KERNEL_MAPPING_BASE 0xc0000000
+#else
+#    define KERNEL_MAPPING_BASE 0x2000000000
+#endif
 
 #ifdef __cplusplus
 

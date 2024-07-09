@@ -39,9 +39,15 @@
 #    include <AK/Types.h>
 #endif
 
-#define ElfW(type) Elf64_##type
-
-#define ELFSIZE 64
+//#if ARCH(I386)
+//can we include AK/Platform.h here?
+#if defined(__i386__) && !defined(__x86_64__)
+#    define ELFSIZE 32
+#    define ElfW(type) Elf32_##type
+#else
+#    define ELFSIZE 64
+#    define ElfW(type) Elf64_##type
+#endif
 
 typedef uint8_t Elf_Byte;
 

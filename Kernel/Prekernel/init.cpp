@@ -136,7 +136,8 @@ extern "C" [[noreturn]] void init()
     VERIFY(kernel_load_base % 0x1000 == 0);
     VERIFY(kernel_load_base >= kernel_mapping_base + kernel_physical_base);
 
-    int pdpt_flags = 0x3;
+    // 32-bit PAE does not require the RW flag in the PDPT
+    int pdpt_flags = ARCH(I386) ? 0x1 : 0x3;
 
     boot_pdpt[(kernel_mapping_base >> 30) & 0x1ffu] = (FlatPtr)boot_pd_kernel | pdpt_flags;
 

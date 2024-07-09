@@ -14,12 +14,13 @@ VALIDATE_IS_X86()
 namespace ELF {
 
 enum class GenericDynamicRelocationType : unsigned {
+    RELATIVE = R_386_RELATIVE,
     NONE = 10000,
     ABSOLUTE,
     COPY,
     GLOB_DAT,
     JUMP_SLOT,
-    RELATIVE,
+    //RELATIVE,
     TLS_DTPMOD,
     TLS_DTPREL,
     TLS_TPREL,

@@ -165,7 +165,7 @@ public:
         {
             return ELF64_R_TYPE(m_rel.r_info);
         }
-        unsigned symbol_index() const { return ELF64_R_SYM(m_rel.r_info); }
+        unsigned symbol_index() const { return ELF_R_SYM(m_rel.r_info); }
         Symbol symbol() const
         {
             return m_image.symbol(symbol_index());

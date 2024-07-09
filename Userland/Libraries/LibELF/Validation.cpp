@@ -26,8 +26,8 @@ bool validate_elf_header(Elf_Ehdr const& elf_header, size_t file_size, bool verb
         return false;
     }
 
-    auto expected_class = ELFCLASS64;
-    auto expected_bitness = 64;
+    auto expected_bitness = sizeof(void*) * 8;
+    auto expected_class = (expected_bitness == 64) ? ELFCLASS64 : ELFCLASS32;
     if (expected_class != elf_header.e_ident[EI_CLASS]) {
         if (verbose)
             dbgln("File is not a {}-bit ELF file.", expected_bitness);
@@ -59,8 +59,8 @@ bool validate_elf_header(Elf_Ehdr const& elf_header, size_t file_size, bool verb
         return false;
     }
 
-    auto expected_machines = Array { EM_X86_64, EM_AARCH64, EM_RISCV };
-    auto expected_machine_names = Array { "x86-64"sv, "aarch64"sv, "riscv64"sv };
+    auto expected_machines = Array { EM_386, EM_X86_64, EM_AARCH64, EM_RISCV };
+    auto expected_machine_names = Array { "i386"sv, "x86-64"sv, "aarch64"sv, "riscv64"sv };
 
     if (!expected_machines.span().contains_slow(elf_header.e_machine)) {
         if (verbose)

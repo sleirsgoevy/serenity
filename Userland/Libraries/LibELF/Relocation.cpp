@@ -59,7 +59,7 @@ namespace ELF {
     for (unsigned i = 0; i < relocation_count; ++i) {
         size_t offset_in_section = i * relocation_entry_size;
         auto* relocation = (Elf_Rela*)(relocation_section_addr + offset_in_section);
-        VERIFY(static_cast<GenericDynamicRelocationType>(ELF64_R_TYPE(relocation->r_info)) == GenericDynamicRelocationType::RELATIVE);
+        VERIFY(static_cast<GenericDynamicRelocationType>(ELF_R_TYPE(relocation->r_info)) == GenericDynamicRelocationType::RELATIVE);
         auto* patch_address = (FlatPtr*)(base_address + relocation->r_offset);
         FlatPtr relocated_address;
         if (use_addend) {

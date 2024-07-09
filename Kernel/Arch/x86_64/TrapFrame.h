@@ -27,7 +27,11 @@ struct TrapFrame {
     TrapFrame& operator=(TrapFrame&&) = delete;
 };
 
-#define TRAP_FRAME_SIZE (3 * sizeof(void*))
+#if ARCH(I386)
+#    define TRAP_FRAME_SIZE 12
+#else
+#    define TRAP_FRAME_SIZE 24
+#endif
 
 static_assert(AssertSize<TrapFrame, TRAP_FRAME_SIZE>());
 
