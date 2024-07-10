@@ -6,7 +6,7 @@
 
 #include <AK/Platform.h>
 #include <AK/Singleton.h>
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    include <Kernel/Arch/x86_64/ISABus/I8042Controller.h>
 #endif
 #include <Kernel/Boot/CommandLine.h>
@@ -135,7 +135,7 @@ UNMAP_AFTER_INIT ErrorOr<void> HIDManagement::enumerate()
     // emulation of the PS/2 controller if it was set by the BIOS.
     // If ACPI indicates we have an i8042 controller and the USB controller was
     // set to emulate PS/2, we should not initialize the PS/2 controller.
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     auto has_i8042_controller = false;
     auto i8042_controller = TRY(I8042Controller::create());
     switch (kernel_command_line().i8042_presence_mode()) {

@@ -45,7 +45,6 @@ Atomic<u32> Processor::s_idle_cpu_mask { 0 };
 
 extern "C" void enter_thread_context(Thread* from_thread, Thread* to_thread) __attribute__((used));
 extern "C" FlatPtr do_init_context(Thread* thread, u32 flags) __attribute__((used));
-extern "C" void syscall_entry();
 
 template<typename T>
 bool ProcessorBase<T>::is_smp_enabled()
@@ -713,7 +712,7 @@ void Processor::write_gdt_entry(u16 selector, Descriptor& descriptor)
 Descriptor& Processor::get_gdt_entry(u16 selector)
 {
     u16 i = (selector & 0xfffc) >> 3;
-    return *(Descriptor*)(&m_gdt[i]);
+    return m_gdt[i];
 }
 
 void Processor::flush_gdt()
@@ -1291,17 +1290,7 @@ UNMAP_AFTER_INIT void Processor::gdt_init()
     write_raw_gdt_entry(GDT_SELECTOR_DATA0, 0x0000ffff, 0x00cf9200); // data0
     write_raw_gdt_entry(GDT_SELECTOR_CODE3, 0x0000ffff, 0x00cffa00); // code3
     write_raw_gdt_entry(GDT_SELECTOR_DATA3, 0x0000ffff, 0x00cff200); // data3
-
-    Descriptor tls_descriptor {};
-    tls_descriptor.low = tls_descriptor.high = 0;
-    tls_descriptor.dpl = 3;
-    tls_descriptor.segment_present = 1;
-    tls_descriptor.granularity = 0;
-    tls_descriptor.operation_size64 = 0;
-    tls_descriptor.operation_size32 = 1;
-    tls_descriptor.descriptor_type = 1;
-    tls_descriptor.type = 2;
-    write_gdt_entry(GDT_SELECTOR_TLS, tls_descriptor); // tls3
+    write_raw_gdt_entry(GDT_SELECTOR_TLS, 0x0000ffff, 0x008ff200); // tls3
 
     Descriptor gs_descriptor {};
     gs_descriptor.set_base(VirtualAddress { this });
@@ -1396,7 +1385,7 @@ extern "C" void enter_thread_context(Thread* from_thread, Thread* to_thread)
     }
 
     auto& processor = Processor::current();
-    //TODO: set fs base?
+    Processor::set_user_gs_base(to_thread->arch_specific_data().gs_base);
 
     if (from_regs.cr3 != to_regs.cr3)
         write_cr3(to_regs.cr3);
@@ -1717,10 +1706,12 @@ UNMAP_AFTER_INIT void ProcessorBase<T>::initialize_context_switching(Thread& ini
     VERIFY_NOT_REACHED();
 }
 
-void Processor::set_fs_base(FlatPtr fs_base)
+void Processor::set_user_gs_base(FlatPtr gs_base)
 {
-    MSR fs_base_msr(MSR_FS_BASE);
-    fs_base_msr.set(fs_base);
+    auto& cpu = Processor::current();
+    auto& descr = cpu.get_gdt_entry(GDT_SELECTOR_TLS);
+    descr.set_base(VirtualAddress { gs_base });
+    // no need to reload segment register now, it'll be done when returning to userspace
 }
 
 template<typename T>

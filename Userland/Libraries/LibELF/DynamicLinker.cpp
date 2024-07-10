@@ -256,7 +256,7 @@ static ErrorOr<FlatPtr> __create_new_tls_region()
     // FIXME: Add support for dynamically-allocated TLS blocks.
     tcb->dynamic_thread_vector = nullptr;
 
-#if ARCH(X86_64)
+#if ARCH(I386) || ARCH(X86_64)
     tcb->thread_pointer = bit_cast<void*>(thread_pointer);
 #endif
 

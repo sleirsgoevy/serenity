@@ -106,8 +106,19 @@ static int create_thread(pthread_t* thread, void* (*entry)(void*), void* argumen
 
     VERIFY((uintptr_t)stack % 16 == 0);
 
+#if ARCH(X86_64)
     // Push a fake return address
     push_on_stack(nullptr);
+#elif ARCH(I386)
+    // Push helper arguments to the stack
+    push_on_stack((void*)thread_params->stack_size);
+    push_on_stack((void*)thread_params->stack_location);
+    push_on_stack((void*)thread_params->entry_argument);
+    push_on_stack((void*)thread_params->entry);
+
+    // Push a fake return address
+    push_on_stack(nullptr);
+#endif
 
     int rc = syscall(SC_create_thread, pthread_create_helper, thread_params);
     if (rc >= 0)

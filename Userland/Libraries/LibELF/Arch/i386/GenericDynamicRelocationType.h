@@ -15,17 +15,16 @@ namespace ELF {
 
 enum class GenericDynamicRelocationType : unsigned {
     RELATIVE = R_386_RELATIVE,
+    ABSOLUTE = R_386_32,
+    GLOB_DAT = R_386_GLOB_DAT,
+    JUMP_SLOT = R_386_JMP_SLOT,
+    TLS_DTPMOD = R_386_TLS_DTPMOD32,
+    TLS_DTPREL = R_386_TLS_DTPOFF32,
+    IRELATIVE = R_386_IRELATIVE,
     NONE = 10000,
-    ABSOLUTE,
     COPY,
-    GLOB_DAT,
-    JUMP_SLOT,
-    //RELATIVE,
-    TLS_DTPMOD,
-    TLS_DTPREL,
     TLS_TPREL,
     TLSDESC,
-    IRELATIVE,
 };
 
 }

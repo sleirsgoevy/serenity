@@ -1136,6 +1136,10 @@ DispatchSignalResult Thread::dispatch_signal(u8 signal)
         // Save the FPU/SSE state
         TRY(copy_value_on_user_stack(stack, fpu_state()));
 
+#if ARCH(I386)
+        // Leave one empty slot to align the stack for a handler call.
+        TRY(push_value_on_user_stack(stack, 0));
+#endif
         TRY(push_value_on_user_stack(stack, pointer_to_ucontext));
         TRY(push_value_on_user_stack(stack, pointer_to_signal_info));
         TRY(push_value_on_user_stack(stack, signal));
@@ -1174,6 +1178,8 @@ DispatchSignalResult Thread::dispatch_signal(u8 signal)
     // Set them to a known-good value to avoid weird handler misbehavior.
     // Only IF (and the reserved bit 1) are set.
     regs.set_flags(2 | (regs.rflags & ~safe_eflags_mask));
+#elif ARCH(I386)
+    regs.set_flags(2 | (regs.eflags & ~safe_eflags_mask));
 #endif
 
     dbgln_if(SIGNAL_DEBUG, "Thread in state '{}' has been primed with signal handler {:p} to deliver {}", state_string(), regs.ip(), signal);

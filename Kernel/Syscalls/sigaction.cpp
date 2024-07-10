@@ -105,6 +105,8 @@ ErrorOr<FlatPtr> Process::sys$sigreturn(RegisterState& registers)
     Thread::current()->m_currently_handled_signal = 0;
 #if ARCH(X86_64)
     auto sp = registers.rsp;
+#elif ARCH(I386)
+    auto sp = registers.esp;
 #endif
 
     copy_ptrace_registers_into_kernel_registers(registers, static_cast<PtraceRegisters const&>(ucontext.uc_mcontext));
@@ -112,6 +114,9 @@ ErrorOr<FlatPtr> Process::sys$sigreturn(RegisterState& registers)
 #if ARCH(X86_64)
     registers.set_userspace_sp(registers.rsp);
     registers.rsp = sp;
+#elif ARCH(I386)
+    registers.set_userspace_sp(registers.esp);
+    registers.esp = sp;
 #endif
 
     return saved_ax;

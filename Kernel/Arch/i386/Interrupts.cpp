@@ -39,6 +39,7 @@ extern FlatPtr start_of_ro_after_init;
 extern FlatPtr end_of_ro_after_init;
 extern FlatPtr start_of_kernel_ksyms;
 extern FlatPtr end_of_kernel_ksyms;
+extern "C" void syscall_entry();
 
 namespace Kernel {
 
@@ -592,7 +593,7 @@ UNMAP_AFTER_INIT void initialize_interrupts()
     register_interrupt_handler(0x7f, interrupt_127_asm_entry);
     register_interrupt_handler(0x80, interrupt_128_asm_entry);
     register_interrupt_handler(0x81, interrupt_129_asm_entry);
-    register_interrupt_handler(0x82, interrupt_130_asm_entry);
+    register_user_callable_interrupt_handler(0x82, syscall_entry);
     register_interrupt_handler(0x83, interrupt_131_asm_entry);
     register_interrupt_handler(0x84, interrupt_132_asm_entry);
     register_interrupt_handler(0x85, interrupt_133_asm_entry);

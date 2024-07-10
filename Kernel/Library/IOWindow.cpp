@@ -11,7 +11,7 @@
 
 namespace Kernel {
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 ErrorOr<NonnullOwnPtr<IOWindow>> IOWindow::create_for_io_space(IOAddress address, u64 space_length)
 {
     VERIFY(!Checked<u64>::addition_would_overflow(address.get(), space_length));
@@ -28,7 +28,7 @@ IOWindow::IOWindow(NonnullOwnPtr<IOAddressData> io_range)
 
 ErrorOr<NonnullOwnPtr<IOWindow>> IOWindow::create_from_io_window_with_offset(u64 offset, u64 space_length)
 {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (m_space_type == SpaceType::IO) {
         VERIFY(m_io_range);
         if (Checked<u64>::addition_would_overflow(m_io_range->address(), space_length))
@@ -52,7 +52,7 @@ ErrorOr<NonnullOwnPtr<IOWindow>> IOWindow::create_from_io_window_with_offset(u64
 ErrorOr<NonnullOwnPtr<IOWindow>> IOWindow::create_from_io_window_with_offset(u64 offset)
 {
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (m_space_type == SpaceType::IO) {
         VERIFY(m_io_range);
         VERIFY(m_io_range->space_length() >= offset);
@@ -71,7 +71,7 @@ ErrorOr<NonnullOwnPtr<IOWindow>> IOWindow::create_for_pci_device_bar(PCI::Device
     auto pci_bar_space_type = PCI::get_BAR_space_type(pci_bar_value);
 
     if (pci_bar_space_type == PCI::BARSpaceType::IOSpace) {
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
         auto pci_bar_space_size = PCI::get_BAR_space_size(pci_device_identifier, pci_bar);
         if (pci_bar_space_size < space_length)
             return Error::from_errno(EIO);
@@ -117,7 +117,7 @@ bool IOWindow::is_access_in_range(u64 offset, size_t byte_size_access) const
 {
     if (Checked<u64>::addition_would_overflow(offset, byte_size_access))
         return false;
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if (m_space_type == SpaceType::IO) {
         VERIFY(m_io_range);
         VERIFY(!Checked<u64>::addition_would_overflow(m_io_range->address(), m_io_range->space_length()));
@@ -242,7 +242,7 @@ u8 volatile* IOWindow::as_memory_address_pointer()
     return m_memory_mapped_range->ptr();
 }
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 IOAddress IOWindow::as_io_address() const
 {
     VERIFY(space_type() == SpaceType::IO);

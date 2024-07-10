@@ -172,7 +172,9 @@ public:
 
     FlatPtr cr3() const
     {
-        return m_directory_table->paddr().get();
+        PhysicalPtr paddr = m_directory_table->paddr().get();
+        VERIFY(paddr == (uint32_t)paddr);
+        return (uint32_t)paddr;
     }
 
     bool is_cr3_initialized() const

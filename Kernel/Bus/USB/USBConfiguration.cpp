@@ -58,7 +58,7 @@ ErrorOr<void> USBConfiguration::enumerate_interfaces()
     while (!stream.is_eof()) {
         // Peek the descriptor header.
         auto const descriptor_header = TRY(stream.read_value<USBDescriptorCommon>());
-        MUST(stream.seek(-sizeof(USBDescriptorCommon), SeekMode::FromCurrentPosition));
+        MUST(stream.seek(-(off_t)sizeof(USBDescriptorCommon), SeekMode::FromCurrentPosition));
 
         switch (descriptor_header.descriptor_type) {
         case DESCRIPTOR_TYPE_INTERFACE: {

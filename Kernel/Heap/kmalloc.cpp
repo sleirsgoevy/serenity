@@ -327,11 +327,13 @@ struct KmallocGlobalData {
         padded_allocation_request *= 2;
         padded_allocation_request += PAGE_SIZE;
         if (padded_allocation_request.has_overflow()) {
-            PANIC("Integer overflow during kmalloc heap expansion");
+            dbgln_if(KMALLOC_DEBUG, "Integer overflow during kmalloc heap expansion");
+            return false;
         }
         auto rounded_allocation_request = Memory::page_round_up(padded_allocation_request.value());
         if (rounded_allocation_request.is_error()) {
-            PANIC("Integer overflow computing pages for kmalloc heap expansion");
+            dbgln_if(KMALLOC_DEBUG, "Integer overflow computing pages for kmalloc heap expansion");
+            return false;
         }
         size_t new_subheap_size = max(minimum_subheap_size, rounded_allocation_request.value());
 

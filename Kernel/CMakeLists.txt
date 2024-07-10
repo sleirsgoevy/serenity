@@ -495,6 +495,9 @@ elseif("${SERENITY_ARCH}" STREQUAL "i386")
         Arch/x86_64/Time/RTC.cpp
         Arch/x86_64/PCSpeaker.cpp
 
+        Arch/x86_64/ISABus/HID/VMWareMouseDevice.cpp
+        Arch/x86_64/ISABus/I8042Controller.cpp
+        Arch/x86_64/ISABus/SerialDevice.cpp
         Arch/x86_64/PCI/Controller/PIIX4HostBridge.cpp
         Arch/x86_64/PCI/Initializer.cpp
         Arch/x86_64/PCI/MSI.cpp
@@ -529,6 +532,7 @@ elseif("${SERENITY_ARCH}" STREQUAL "i386")
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/Processor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/x86_64/ProcessorInfo.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/SafeMem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Arch/i386/SyscallEntry.cpp
     )
 
 elseif("${SERENITY_ARCH}" STREQUAL "aarch64")

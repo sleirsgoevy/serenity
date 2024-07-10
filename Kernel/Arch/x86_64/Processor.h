@@ -164,7 +164,11 @@ public:
     static void smp_unicast(u32 cpu, Function<void()>, bool async);
     static void smp_broadcast_flush_tlb(Memory::PageDirectory const*, VirtualAddress, size_t);
 
+#if ARCH(I386)
+    static void set_user_gs_base(FlatPtr);
+#else
     static void set_fs_base(FlatPtr);
+#endif
 };
 
 template<typename T>

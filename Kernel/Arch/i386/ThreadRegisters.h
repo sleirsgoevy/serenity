@@ -66,7 +66,8 @@ struct ThreadRegisters {
             gs = GDT_SELECTOR_PROC;
         } else {
             cs = GDT_SELECTOR_CODE3 | 3;
-            ds = es = ss = GDT_SELECTOR_DATA3 | 3;
+            ds = es = ss = fs = GDT_SELECTOR_DATA3 | 3;
+            gs = GDT_SELECTOR_TLS | 3;
         }
 
         cr3 = space.page_directory().cr3();
@@ -93,6 +94,8 @@ struct ThreadRegisters {
     void set_exec_state(FlatPtr entry_ip, FlatPtr userspace_sp, Memory::AddressSpace& space)
     {
         cs = GDT_SELECTOR_CODE3 | 3;
+        ds = es = ss = fs = GDT_SELECTOR_DATA3 | 3;
+        gs = GDT_SELECTOR_TLS | 3;
         eip = entry_ip;
         esp = userspace_sp;
         cr3 = space.page_directory().cr3();

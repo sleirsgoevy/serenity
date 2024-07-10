@@ -182,7 +182,7 @@ constexpr T rint(T x)
     //        this would make us use `rounds[sd] %num, %res, 0b100`
     //        and `frintn` respectively,
     //        no such guaranteed round exists for x87 `frndint`
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
 #    ifdef __SSE4_1__
     if constexpr (IsSame<T, double>) {
         T r;
@@ -393,7 +393,7 @@ constexpr T fmod(T x, T y)
 {
     CONSTEXPR_STATE(fmod, x, y);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     u16 fpu_status;
     do {
         asm(
@@ -442,7 +442,7 @@ constexpr T remainder(T x, T y)
 {
     CONSTEXPR_STATE(remainder, x, y);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     u16 fpu_status;
     do {
         asm(
@@ -475,7 +475,7 @@ constexpr T sqrt(T x)
 {
     CONSTEXPR_STATE(sqrt, x);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if constexpr (IsSame<T, float>) {
         float res;
         asm("sqrtss %1, %0"
@@ -555,7 +555,7 @@ constexpr T sin(T angle)
 {
     CONSTEXPR_STATE(sin, angle);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret;
     asm(
         "fsin"
@@ -578,7 +578,7 @@ constexpr T cos(T angle)
 {
     CONSTEXPR_STATE(cos, angle);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret;
     asm(
         "fcos"
@@ -604,7 +604,7 @@ constexpr void sincos(T angle, T& sin_val, T& cos_val)
         cos_val = cos(angle);
         return;
     }
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     asm(
         "fsincos"
         : "=t"(cos_val), "=u"(sin_val)
@@ -620,7 +620,7 @@ constexpr T tan(T angle)
 {
     CONSTEXPR_STATE(tan, angle);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret, one;
     asm(
         "fptan"
@@ -644,7 +644,7 @@ constexpr T atan(T value)
 {
     CONSTEXPR_STATE(atan, value);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret;
     asm(
         "fld1\n"
@@ -704,7 +704,7 @@ constexpr T atan2(T y, T x)
 {
     CONSTEXPR_STATE(atan2, y, x);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret;
     asm("fpatan"
         : "=t"(ret)
@@ -739,7 +739,7 @@ constexpr T log2(T x)
 {
     CONSTEXPR_STATE(log2, x);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     if constexpr (IsSame<T, long double>) {
         T ret;
         asm(
@@ -821,7 +821,7 @@ constexpr T log(T x)
 {
     CONSTEXPR_STATE(log, x);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret;
     asm(
         "fldln2\n"
@@ -843,7 +843,7 @@ constexpr T log10(T x)
 {
     CONSTEXPR_STATE(log10, x);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T ret;
     asm(
         "fldlg2\n"
@@ -865,7 +865,7 @@ constexpr T exp(T exponent)
 {
     CONSTEXPR_STATE(exp, exponent);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T res;
     asm("fldl2e\n"
         "fmulp\n"
@@ -893,7 +893,7 @@ constexpr T exp2(T exponent)
 {
     CONSTEXPR_STATE(exp2, exponent);
 
-#if ARCH(X86_64)
+#if ARCH(X86_64) || ARCH(I386)
     T res;
     asm("fld1\n"
         "fld %%st(1)\n"

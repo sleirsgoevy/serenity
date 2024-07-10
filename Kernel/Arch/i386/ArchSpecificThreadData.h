@@ -11,6 +11,7 @@
 namespace Kernel {
 
 struct ArchSpecificThreadData {
+    FlatPtr gs_base { 0 };
 };
 
 }

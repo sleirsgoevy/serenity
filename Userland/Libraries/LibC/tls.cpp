@@ -26,8 +26,8 @@ void* __tls_get_addr(__tls_index* index)
 }
 
 #if ARCH(I386)
-extern "C" void* ___tls_get_addr(__tls_index* index);
-extern "C" void* ___tls_get_addr(__tls_index* index)
+extern "C" [[gnu::regparm(1)]] void* ___tls_get_addr(__tls_index* index);
+extern "C" [[gnu::regparm(1)]] void* ___tls_get_addr(__tls_index* index)
 {
     return __tls_get_addr(index);
 }

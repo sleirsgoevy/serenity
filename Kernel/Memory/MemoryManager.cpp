@@ -857,7 +857,7 @@ PageTableEntry* MemoryManager::pte(PageDirectory& page_directory, VirtualAddress
     if (!pde.is_present())
         return nullptr;
 
-    return &quickmap_pt(PhysicalAddress((FlatPtr)pde.page_table_base()))[page_table_index];
+    return &quickmap_pt(PhysicalAddress(pde.page_table_base()))[page_table_index];
 }
 
 PageTableEntry* MemoryManager::ensure_pte(PageDirectory& page_directory, VirtualAddress vaddr)
@@ -912,7 +912,7 @@ void MemoryManager::release_pte(PageDirectory& page_directory, VirtualAddress va
     auto* pd = quickmap_pd(page_directory, page_directory_table_index);
     PageDirectoryEntry& pde = pd[page_directory_index];
     if (pde.is_present()) {
-        auto* page_table = quickmap_pt(PhysicalAddress((FlatPtr)pde.page_table_base()));
+        auto* page_table = quickmap_pt(PhysicalAddress(pde.page_table_base()));
         auto& pte = page_table[page_table_index];
         pte.clear();
 

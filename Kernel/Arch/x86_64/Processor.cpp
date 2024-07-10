@@ -742,7 +742,7 @@ void Processor::write_gdt_entry(u16 selector, Descriptor& descriptor)
 Descriptor& Processor::get_gdt_entry(u16 selector)
 {
     u16 i = (selector & 0xfffc) >> 3;
-    return *(Descriptor*)(&m_gdt[i]);
+    return m_gdt[i];
 }
 
 void Processor::flush_gdt()
