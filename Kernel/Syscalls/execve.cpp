@@ -393,6 +393,7 @@ static ErrorOr<LoadResult> load_elf_object(Memory::AddressSpace& new_space, Open
     auto* stack_region = TRY(new_space.allocate_region(Memory::RandomizeVirtualAddress::Yes, {}, stack_size, PAGE_SIZE, "Stack (Main thread)"sv, PROT_READ | PROT_WRITE, AllocationStrategy::Reserve));
     stack_region->set_stack(true);
 
+    dbgln("add-symbol-file {} -o {}", object_description.original_absolute_path(), load_base_address);
     return LoadResult {
         load_base_address,
         elf_image.entry().offset(load_offset).get(),

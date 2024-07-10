@@ -920,6 +920,7 @@ def configure_and_run():
     os.chdir(BUILD_DIRECTORY)
 
     with TapController(config.machine_type):
+        print(*map(shlex.quote, map(str, arguments)))
         run(arguments)
 
 

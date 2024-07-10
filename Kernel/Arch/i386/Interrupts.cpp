@@ -720,6 +720,10 @@ UNMAP_AFTER_INIT void initialize_interrupts()
     register_interrupt_handler(0xfe, interrupt_254_asm_entry);
     register_interrupt_handler(0xff, interrupt_255_asm_entry);
 
+    /*memset(&s_idt[6], 0, 8);
+    memset(&s_idt[8], 0, 8);
+    memset(&s_idt[13], 0, 8);*/
+
     for (u8 i = 0; i < GENERIC_INTERRUPT_HANDLERS_COUNT; ++i) {
         auto* handler = new UnhandledInterruptHandler(i);
         handler->register_interrupt_handler();

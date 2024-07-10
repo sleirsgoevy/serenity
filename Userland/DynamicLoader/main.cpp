@@ -189,6 +189,17 @@ ALWAYS_INLINE static void optimizer_fence()
     // Similarly, make sure no non-offset-agnostic language features are used above this point.
     optimizer_fence();
 
+    struct sigaction sa = {};
+    sa.sa_sigaction = [](int, siginfo_t*, void* uc)
+    {
+        ((__ucontext*)uc)->uc_mcontext.eip = (uintptr_t)(void(*)())[]()
+        {
+            asm volatile("movaps 1, %xmm0");
+        };
+    };
+    sa.sa_flags = SA_SIGINFO;
+    (void)sa;
+    //sigaction(SIGSEGV, &sa, 0);
     // Initialize the copy of libc included statically in Loader.so,
     // initialization of the dynamic libc.so is done by the DynamicLinker
     __libc_init();

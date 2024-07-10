@@ -1,9 +1,9 @@
-if (ENABLE_EXTRA_KERNEL_DEBUG_SYMBOLS)
+#if (ENABLE_EXTRA_KERNEL_DEBUG_SYMBOLS)
     add_compile_options(-Og)
     add_compile_options(-ggdb3)
-else()
-    add_compile_options(-O2)
-endif()
+#else()
+#    add_compile_options(-O2)
+#endif()
 
 if ("${SERENITY_ARCH}" STREQUAL "aarch64")
     set(KERNEL_ARCH aarch64)
