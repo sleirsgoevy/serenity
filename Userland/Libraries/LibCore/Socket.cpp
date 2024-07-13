@@ -188,7 +188,7 @@ ErrorOr<void> PosixSocketHelper::set_close_on_exec(bool enabled)
 
 ErrorOr<void> PosixSocketHelper::set_receive_timeout(Duration timeout)
 {
-    auto timeout_spec = timeout.to_timespec();
+    auto timeout_spec = timeout.to_timeval();
     return System::setsockopt(m_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout_spec, sizeof(timeout_spec));
 }
 
