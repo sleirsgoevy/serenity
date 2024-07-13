@@ -223,7 +223,9 @@ ErrorOr<FlatPtr> Process::sys$read(int fd, Userspace<u8*> buffer, size_t size)
     return result;
 }
 
-ErrorOr<FlatPtr> Process::sys$pread(int fd, Userspace<u8*> buffer, size_t size, off_t userspace_offset)
+// NOTE: The offset is passed by pointer because off_t is 64bit,
+// hence it can't be passed by register on 32bit platforms.
+ErrorOr<FlatPtr> Process::sys$pread(int fd, Userspace<u8*> buffer, size_t size, Userspace<off_t const*> userspace_offset)
 {
     Optional<MonotonicTime> start_timestamp = {};
 
@@ -232,7 +234,8 @@ ErrorOr<FlatPtr> Process::sys$pread(int fd, Userspace<u8*> buffer, size_t size, 
         start_timestamp = TimeManagement::the().monotonic_time(TimePrecision::Precise);
     }
 
-    auto result = pread_impl(fd, buffer, size, userspace_offset);
+    auto offset = TRY(copy_typed_from_user(userspace_offset));
+    auto result = pread_impl(fd, buffer, size, offset);
 
     if (!profiling_enabled_at_entry || Thread::current()->is_profiling_suppressed())
         return result;
@@ -250,7 +253,7 @@ ErrorOr<FlatPtr> Process::sys$pread(int fd, Userspace<u8*> buffer, size_t size, 
     data.data.pread.fd = fd;
     data.data.pread.buffer_ptr = buffer.ptr();
     data.data.pread.size = size;
-    data.data.pread.offset = userspace_offset;
+    data.data.pread.offset = offset;
 
     if (result.is_error()) {
         data.result.is_error = true;
